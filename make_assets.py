@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 
+import io
 import json
 import shutil
 import subprocess
@@ -329,3 +330,181 @@ def build_line_strip(out_dir: Path, dst: Path, rows: int = 5, width: int = 1200)
         y += im.height + gap
     canvas.save(dst, optimize=True)
     print(f"   줄별 판정 {len(scaled)}줄 → {dst.name}")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 랜딩 «복원 과정» 4칸 — 같은 글자를 같은 배율로 따라간다
+# ══════════════════════════════════════════════════════════════════════════
+#
+# 왜 다시 만들었나 (2026-08-30):
+#   처음에는 단계마다 아무 산출물이나 잘라 넣었다. 그랬더니 네 칸의 배율이 제각각이라
+#   눈이 갈 곳이 없고, 무엇이 달라지는지 알 수 없었다. 이미지가 스스로를 설명하지 못하면
+#   없는 것만 못하다.
+#
+#   그래서 «같은 글자 한 곳»을 같은 배율로 네 번 보여 준다.
+#   보는 사람은 위치를 옮기지 않고 무엇이 달라지는지만 보면 된다.
+
+#: 라벨에서 따라갈 구간 (pt). 「전성분」 제목과 첫 본문 줄.
+# 「전성분」 제목 + 본문 두 줄이 «통째로» 들어가는 구간.
+# 줄 중간에서 자르면 글자가 반쪽으로 잘려 무엇을 보는지 알 수 없다.
+DETAIL_BOX = (19.0, 63.5, 121.0, 93.8)
+
+
+def detail_crop(pdf: Path, dst: Path, box=DETAIL_BOX, out_w: int = 900) -> None:
+    """PDF 의 한 구간만 잘라 같은 크기로 저장한다."""
+    from PIL import Image
+    d = pymupdf.open(pdf)
+    pm = d[0].get_pixmap(dpi=600, clip=pymupdf.Rect(*box), alpha=False)
+    im = Image.open(io.BytesIO(pm.tobytes("png")))
+    d.close()
+    im = im.resize((out_w, round(im.height * out_w / im.width)), Image.LANCZOS)
+    im.save(dst, optimize=True)
+
+
+def detail_from_png(src: Path, dst: Path, page_w_pt: float, box=DETAIL_BOX,
+                    out_w: int = 900) -> None:
+    """이미 만들어진 전체 PNG 에서 같은 구간을 잘라 낸다 (겹쳐보기용)."""
+    from PIL import Image
+    im = Image.open(src)
+    k = im.width / page_w_pt
+    c = im.crop(tuple(round(v * k) for v in box))
+    c = c.resize((out_w, round(c.height * out_w / c.width)), Image.LANCZOS)
+    c.convert("RGB").save(dst, optimize=True)
+
+
+def build_match_card(work: Path, outlined: Path, dst: Path, out_w: int = 900) -> None:
+    """«모양을 겹쳐 보고 맞힌다»를 한 장으로 보여 준다.
+
+    ① 은 **실제 파일에서 잘라낸 도형**이다. 폰트로 다시 그린 것이 아니다 —
+    그러면 «받은 도형»이라는 말이 거짓이 되고, 이 사이트의 다른 주장도 같이 무너진다.
+    ② 는 서체 원본, ③ 은 둘을 포개어 놓은 것. 아래에 겹침 점수와 밀린 후보를 적는다.
+
+    이 그림이 이 서비스의 원리 전체다 — 글자를 «읽는» 게 아니라 «겹쳐 재는» 것.
+    """
+    from PIL import Image, ImageDraw
+    import numpy as np
+    from textrevival.core import glyphs as G
+
+    recog = json.loads((work / "recog.json").read_text("utf-8"))
+    units = json.loads((work / "units.json").read_text("utf-8"))
+    by_idx = {u["idx"]: u for u in units} if isinstance(units, list) else {}
+
+    # 후보 점수 차이가 뚜렷하고, 실제 도형을 집어낼 수 있는 글리프를 고른다.
+    best = None
+    for ln in recog.get("lines", []):
+        for pg in ln.get("per_glyph", []):
+            alts = pg.get("alts") or []
+            u = by_idx.get(pg.get("u"))
+            if len(alts) < 3 or pg.get("iou", 0) < 0.98 or u is None:
+                continue
+            spread = alts[0][1] - alts[1][1]
+            # 한글을 우선한다 — 국내 고객이 보는 화면이다.
+            score = spread + (0.5 if "가" <= pg["ch"] <= "힣" else 0)
+            if best is None or score > best[0]:
+                best = (score, pg, ln, u)
+    if best is None:
+        print("   맞춤 카드: 쓸 만한 글리프를 못 찾음"); return
+    _, pg, ln, unit = best
+    ch, iou, alts = pg["ch"], pg["iou"], pg["alts"]
+
+    fpath = ROOT / "fonts" / "ofl" / pg["font"]
+    if not fpath.exists():
+        fpath = next((ROOT / "fonts").rglob(pg["font"]), None)
+    if fpath is None:
+        print("   맞춤 카드: 폰트를 못 찾음"); return
+
+    # ── ① 실제 파일에서 이 글자의 도형만 잘라 낸다 ────────────────────────
+    # ⚠ units.json 의 bbox 는 **PDF 좌표(y 가 아래에서 위)** 다. 반면 렌더러의 clip 은
+    #   페이지 좌상단이 원점이다. 뒤집지 않으면 엉뚱한 글자를 잘라 놓고
+    #   «받은 도형»이라고 이름 붙이게 된다 (2026-08-30 실제로 그랬다).
+    x0, y0, x1, y1 = unit["bbox"]
+    doc = pymupdf.open(outlined)
+    ph = doc[0].rect.height
+    clip = pymupdf.Rect(x0, ph - y1, x1, ph - y0)
+    pm = doc[0].get_pixmap(dpi=1200, clip=clip, alpha=False)
+    shape = Image.open(io.BytesIO(pm.tobytes("png"))).convert("L")
+    doc.close()
+    sh = np.asarray(shape) < 128           # 잉크 = True
+
+    # ── ② 서체 원본 ─────────────────────────────────────────────────────
+    N = 320
+    fh = G.load_font(fpath)
+    gname = G.glyph_name_for_char(fh, ch)
+    mask = G.glyph_raster(fh, gname, N) if gname else None
+    if mask is None:
+        print("   맞춤 카드: 래스터 실패"); return
+    fo = np.asarray(mask, dtype=bool)
+
+    def to_box(a, n=N):
+        """잉크의 경계상자로 맞추되 **가로세로 비율은 지킨다**.
+
+        점수를 재는 알고리즘은 정사각형으로 늘려서 비교하지만, 사람이 보는 그림에서
+        그렇게 하면 글자가 찌그러져 무엇인지 알아볼 수 없다. 보여 줄 때는 비율을 지킨다.
+        """
+        ys, xs = np.where(a)
+        if len(xs) == 0:
+            return np.zeros((n, n), bool)
+        crop = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        h, w = crop.shape
+        k = min(n / w, n / h)
+        nw, nh = max(1, int(w * k)), max(1, int(h * k))
+        im = Image.fromarray((crop * 255).astype("uint8")).resize((nw, nh), Image.LANCZOS)
+        out = np.zeros((n, n), bool)
+        oy, ox = (n - nh) // 2, (n - nw) // 2
+        out[oy:oy + nh, ox:ox + nw] = np.asarray(im) > 127
+        return out
+
+    A = to_box(sh)
+    B = to_box(fo)
+
+    pad, gap, inset = 26, 22, 16
+    cell = (out_w - pad * 2 - gap * 2) // 3
+    head, foot = 34, 82
+    H = pad + head + cell + foot
+    canvas = Image.new("RGB", (out_w, H), (255, 255, 255))
+    d = ImageDraw.Draw(canvas)
+
+    def paste(x0c, layers):
+        img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+        px = img.load()
+        for arr, color, edge_only in layers:
+            src = arr
+            if edge_only:
+                e = np.zeros_like(arr)
+                e[1:-1, 1:-1] = arr[1:-1, 1:-1] & ~(
+                    arr[:-2, 1:-1] & arr[2:, 1:-1] & arr[1:-1, :-2] & arr[1:-1, 2:])
+                src = e
+            ys, xs = np.where(src)
+            for yy, xx in zip(ys.tolist(), xs.tolist()):
+                px[xx, yy] = color
+        inner = cell - inset * 2
+        canvas.paste(img.resize((inner, inner), Image.LANCZOS),
+                     (x0c + inset, pad + head + inset), img.resize((inner, inner), Image.LANCZOS))
+        d.rectangle([x0c, pad + head, x0c + cell, pad + head + cell],
+                    outline=(232, 236, 234), width=1)
+
+    xs3 = [pad, pad + cell + gap, pad + (cell + gap) * 2]
+    for x, t in zip(xs3, ("① 받은 도형 — 파일에서 잘라냄", "② 서체 원본", "③ 겹쳐 보면")):
+        d.text((x, pad + 8), t, fill=(92, 103, 99), font=_ui(13))
+    paste(xs3[0], [(A, (14, 22, 19, 255), False)])
+    paste(xs3[1], [(B, (30, 122, 90, 255), True)])
+    paste(xs3[2], [(A, (190, 198, 195, 255), False), (B, (30, 122, 90, 255), True)])
+
+    fy = pad + head + cell + 20
+    d.text((pad, fy), f"겹침 점수  {iou:.4f}", fill=(14, 22, 19), font=_ui(21, True))
+    parts = "   ".join(f"{a[0]} {a[1]:.3f}" for a in alts[:3])
+    d.text((pad, fy + 32), f"다음 후보  {parts}", fill=(92, 103, 99), font=_ui(15))
+    d.text((out_w - pad - 250, fy + 6),
+           str(ln.get("font", "")).replace(".otf", "").replace(".ttf", ""),
+           fill=(150, 158, 155), font=_ui(13))
+    canvas.save(dst, optimize=True)
+    print(f"   맞춤 카드: '{ch}' {iou:.4f} / 후보 {parts}")
+
+
+def _ui(size: int, bold: bool = False):
+    from PIL import ImageFont
+    p = ROOT / "fonts" / "ofl" / ("Pretendard-Bold.ttf" if bold else "Pretendard-Regular.ttf")
+    try:
+        return ImageFont.truetype(str(p), size)
+    except Exception:
+        return ImageFont.load_default()

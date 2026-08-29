@@ -1,4 +1,4 @@
-# 되살림 — 웹사이트 (GitHub Pages, 무료)
+# Typeback — 웹사이트 (GitHub Pages, 무료)
 
 이 폴더 하나가 통째로 웹사이트입니다. 서버도, 빌드도, 비용도 없습니다.
 정적 파일이라 GitHub Pages 무료 요금제로 그냥 올라갑니다.
