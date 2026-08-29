@@ -3,3 +3,4 @@ assets/_*
 assets/meta.json
 __pycache__/
 *.pyc
+_*
