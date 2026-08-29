@@ -1,0 +1,50 @@
+{
+ "note": "자체 제작 샘플을 실제 복원 시스템에 통과시킨 결과. 고객 파일 아님.",
+ "items": [
+  {
+   "key": "cosmetic",
+   "label": "화장품 라벨",
+   "note": "전성분·사용법이 빼곡한 뒷면",
+   "detected": 16,
+   "restored": 14,
+   "refused": 2,
+   "seconds": 34.6
+  },
+  {
+   "key": "supplement",
+   "label": "건강기능식품",
+   "note": "영양성분표와 주의사항",
+   "detected": 29,
+   "restored": 29,
+   "refused": 0,
+   "seconds": 39.4
+  },
+  {
+   "key": "brochure",
+   "label": "브로슈어 내지",
+   "note": "2단 구성의 안내물",
+   "detected": 19,
+   "restored": 18,
+   "refused": 1,
+   "seconds": 35.7
+  },
+  {
+   "key": "card",
+   "label": "명함",
+   "note": "흰 글자 · 어두운 배경",
+   "detected": 7,
+   "restored": 6,
+   "refused": 1,
+   "seconds": 27.5
+  },
+  {
+   "key": "food",
+   "label": "식품 패키지",
+   "note": "원재료명·영양정보 표",
+   "detected": 27,
+   "restored": 26,
+   "refused": 1,
+   "seconds": 42.5
+  }
+ ]
+}

@@ -508,3 +508,131 @@ def _ui(size: int, bold: bool = False):
         return ImageFont.truetype(str(p), size)
     except Exception:
         return ImageFont.load_default()
+
+
+def build_ambiguous_card(work: Path, outlined: Path, dst: Path, out_w: int = 900) -> None:
+    """«모양이 완벽히 맞았는데도 손대지 않은» 경우를 보여 준다.
+
+    이 서비스에서 가장 중요한 그림이다. 대문자 I 와 소문자 l 은 이 서체에서 모양이
+    완전히 같다. 겹침 점수가 0.9999 로 나와도 **어느 쪽인지 알 수 없다.**
+    브랜드명에 잘못된 글자가 인쇄되는 것이 최악이므로, 이런 줄은 복원하지 않고
+    원본 도형 그대로 둔다.
+
+    실제 샘플에서 손대지 않은 3줄이 전부 이 경우였다.
+    «잘 맞는 오답» 이 최악의 실패 모드라는 원칙이 숫자로 드러나는 자리다.
+    """
+    from PIL import Image, ImageDraw
+    import numpy as np
+    from textrevival.core import glyphs as G
+
+    recog = json.loads((work / "recog.json").read_text("utf-8"))
+    units = json.loads((work / "units.json").read_text("utf-8"))
+    by_idx = {u["idx"]: u for u in units} if isinstance(units, list) else {}
+    spec = json.loads((work / "spec.json").read_text("utf-8"))
+    done = {l["id"] for l in spec.get("lines", [])}
+
+    target = None
+    for ln in recog.get("lines", []):
+        if ln["id"] in done or not (ln.get("confusables") or []):
+            continue
+        for pg in ln.get("per_glyph", []):
+            if pg.get("ch") in ("l", "I") and by_idx.get(pg.get("u")):
+                target = (ln, pg, by_idx[pg["u"]]); break
+        if target:
+            break
+    if target is None:
+        print("   미상 카드: 대상 없음"); return
+    ln, pg, unit = target
+
+    fpath = ROOT / "fonts" / "ofl" / pg["font"]
+    if not fpath.exists():
+        fpath = next((ROOT / "fonts").rglob(pg["font"]), None)
+    if fpath is None:
+        print("   미상 카드: 폰트 없음"); return
+
+    x0, y0, x1, y1 = unit["bbox"]
+    doc = pymupdf.open(outlined)
+    ph = doc[0].rect.height
+    pm = doc[0].get_pixmap(dpi=1600, clip=pymupdf.Rect(x0, ph - y1, x1, ph - y0), alpha=False)
+    shape = np.asarray(Image.open(io.BytesIO(pm.tobytes("png"))).convert("L")) < 128
+    doc.close()
+
+    N = 300
+    fh = G.load_font(fpath)
+
+    def raster(ch):
+        gn = G.glyph_name_for_char(fh, ch)
+        m = G.glyph_raster(fh, gn, N) if gn else None
+        return None if m is None else np.asarray(m, dtype=bool)
+
+    def norm(a, n=N):
+        ys, xs = np.where(a)
+        if not len(xs):
+            return np.zeros((n, n), bool)
+        crop = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+        h, w = crop.shape
+        k = min(n / max(w, 1), n / max(h, 1))
+        nw, nh = max(1, int(w * k)), max(1, int(h * k))
+        im = Image.fromarray((crop * 255).astype("uint8")).resize((nw, nh), Image.LANCZOS)
+        out = np.zeros((n, n), bool)
+        oy, ox = (n - nh) // 2, (n - nw) // 2
+        out[oy:oy + nh, ox:ox + nw] = np.asarray(im) > 127
+        return out
+
+    def iou(a, b):
+        u = (a | b).sum()
+        return float((a & b).sum() / u) if u else 0.0
+
+    A = norm(shape)
+    cands = []
+    for ch in ("I", "l"):
+        r = raster(ch)
+        if r is not None:
+            cands.append((ch, norm(r)))
+    if len(cands) < 2:
+        print("   미상 카드: 후보 래스터 실패"); return
+
+    pad, gap, inset = 26, 22, 22
+    cell = (out_w - pad * 2 - gap * 2) // 3
+    head, foot = 34, 96
+    canvas = Image.new("RGB", (out_w, pad + head + cell + foot), (255, 255, 255))
+    d = ImageDraw.Draw(canvas)
+
+    def paste(x, arr, color, outline=False):
+        img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+        px = img.load()
+        src = arr
+        if outline:
+            e = np.zeros_like(arr)
+            e[1:-1, 1:-1] = arr[1:-1, 1:-1] & ~(
+                arr[:-2, 1:-1] & arr[2:, 1:-1] & arr[1:-1, :-2] & arr[1:-1, 2:])
+            src = e
+        for yy, xx in zip(*np.where(src)):
+            px[int(xx), int(yy)] = color
+        inner = cell - inset * 2
+        rs = img.resize((inner, inner), Image.LANCZOS)
+        canvas.paste(rs, (x + inset, pad + head + inset), rs)
+        d.rectangle([x, pad + head, x + cell, pad + head + cell],
+                    outline=(232, 236, 234), width=1)
+
+    xs = [pad, pad + cell + gap, pad + (cell + gap) * 2]
+    labels = ["① 받은 도형", f"② 후보 — 대문자 {cands[0][0]}", f"③ 후보 — 소문자 {cands[1][0]}"]
+    for x, t in zip(xs, labels):
+        d.text((x, pad + 8), t, fill=(92, 103, 99), font=_ui(13))
+    paste(xs[0], A, (14, 22, 19, 255))
+    paste(xs[1], cands[0][1], (30, 122, 90, 255), outline=True)
+    paste(xs[2], cands[1][1], (30, 122, 90, 255), outline=True)
+
+    s1, s2 = iou(A, cands[0][1]), iou(A, cands[1][1])
+    fy = pad + head + cell + 18
+    d.text((xs[1], fy), f"{s1:.4f}", fill=(14, 22, 19), font=_ui(21, True))
+    d.text((xs[2], fy), f"{s2:.4f}", fill=(14, 22, 19), font=_ui(21, True))
+    d.text((pad, fy + 2), "판정 — 미상", fill=(180, 83, 74), font=_ui(19, True))
+    d.text((pad, fy + 34),
+           "두 후보의 모양이 완전히 같습니다. 점수로는 고를 수 없습니다.",
+           fill=(92, 103, 99), font=_ui(14))
+    d.text((pad, fy + 58),
+           f"그래서 이 줄({ln['text'][:26]})은 복원하지 않고 원본 그대로 두었습니다.",
+           fill=(92, 103, 99), font=_ui(14))
+    canvas.save(dst, optimize=True)
+    print(f"   미상 카드: {ln['text'][:24]!r}  I={s1:.4f}  l={s2:.4f}")

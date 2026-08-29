@@ -111,3 +111,168 @@
     els.forEach(function (el) { io.observe(el); });
   })();
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Typeback — 인터랙션 (2026-08-30 추가)
+
+   전부 «실제 측정치»로만 움직인다. 보기 좋으라고 만든 가짜 수치는 넣지 않는다.
+     · 판정 탐색기 : assets/probe.json — 샘플에서 나온 글리프별 후보 점수
+     · 복원 사례   : assets/gallery.json + assets/gallery/<키>/{before,after}.png
+     · 숫자 세기   : 화면에 들어올 때 한 번만
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ── 숫자 세기 ────────────────────────────────────────────────── */
+  function countUp(el) {
+    var to = parseFloat(el.dataset.to), suf = el.dataset.suffix || "";
+    if (isNaN(to)) return;
+    // 기본 표시는 «최종값» 이다. 스크립트가 못 돌면 0 이 남아 틀린 숫자를 보여 준다.
+    if (RM) { el.textContent = to + suf; return; }
+    var t0 = null, dur = 900;
+    el.textContent = "0" + suf;
+    function tick(t) {
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / dur);
+      var e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * e) + suf;
+      if (k < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  if ("IntersectionObserver" in window) {
+    var co = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        co.unobserve(en.target); countUp(en.target);
+      });
+    }, { threshold: .5 });
+    document.querySelectorAll(".count").forEach(function (el) { co.observe(el); });
+  } else {
+    document.querySelectorAll(".count").forEach(countUp);
+  }
+
+  /* ── 판정 탐색기 ──────────────────────────────────────────────── */
+  (function () {
+    var tabs = document.getElementById("probeTabs"),
+        bars = document.getElementById("probeBars"),
+        note = document.getElementById("probeNote");
+    if (!tabs) return;
+
+    fetch("assets/probe.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d) throw new Error("no data");
+        var keys = Object.keys(d);
+        keys.forEach(function (ch, i) {
+          var b = document.createElement("button");
+          b.type = "button"; b.textContent = ch;
+          b.setAttribute("role", "tab");
+          b.setAttribute("aria-selected", i === 0 ? "true" : "false");
+          b.addEventListener("click", function () { pick(ch, b); });
+          tabs.appendChild(b);
+        });
+        pick(keys[0], tabs.firstElementChild);
+
+        function pick(ch, btn) {
+          [].forEach.call(tabs.children, function (x) {
+            x.setAttribute("aria-selected", String(x === btn));
+          });
+          var alts = d[ch].alts;
+          bars.innerHTML = alts.map(function (a) {
+            return '<div class="probe-bar"><b>' + a[0] + "</b>" +
+              '<span class="track"><span class="fill"></span></span>' +
+              '<span class="v">' + a[1].toFixed(4) + "</span></div>";
+          }).join("");
+          // 다음 프레임에 폭을 넣어야 전환이 보인다.
+          requestAnimationFrame(function () {
+            [].forEach.call(bars.querySelectorAll(".fill"), function (f, i) {
+              f.style.width = (alts[i][1] * 100).toFixed(1) + "%";
+            });
+          });
+          var gap = alts[0][1] - alts[1][1];
+          note.innerHTML = "1등 <b>" + alts[0][0] + "</b> 과 2등 <b>" + alts[1][0] +
+            "</b> 의 점수 차이는 <b>" + gap.toFixed(4) + "</b> 입니다. " +
+            (gap > 0.05
+              ? "충분히 벌어져 있어 <b>" + alts[0][0] + "</b> 로 확정했습니다."
+              : "너무 붙어 있어 모양만으로는 고를 수 없습니다 — 이런 글자는 따로 확인합니다.");
+        }
+      })
+      .catch(function () {
+        document.getElementById("probe").style.display = "none";
+      });
+  })();
+
+  /* ── 복원 사례 갤러리 ─────────────────────────────────────────── */
+  (function () {
+    var tabs = document.getElementById("galTabs");
+    if (!tabs) return;
+    var view = document.getElementById("galView"),
+        top = document.getElementById("galTop"),
+        handle = document.getElementById("galHandle"),
+        imgA = document.getElementById("galAfter"),
+        imgB = document.getElementById("galBefore");
+    var pos = 0.5, dragging = false;
+
+    function paint() {
+      top.style.clipPath = "inset(0 " + ((1 - pos) * 100).toFixed(2) + "% 0 0)";
+      handle.style.left = (pos * 100).toFixed(2) + "%";
+    }
+    function at(x) {
+      var r = view.getBoundingClientRect();
+      pos = Math.min(1, Math.max(0, (x - r.left) / r.width)); paint();
+    }
+    view.addEventListener("pointerdown", function (e) {
+      dragging = true; view.setPointerCapture(e.pointerId); at(e.clientX); e.preventDefault();
+    });
+    view.addEventListener("pointermove", function (e) { if (dragging) at(e.clientX); });
+    ["pointerup", "pointercancel"].forEach(function (t) {
+      view.addEventListener(t, function () { dragging = false; });
+    });
+    view.tabIndex = 0;
+    view.setAttribute("role", "slider");
+    view.setAttribute("aria-label", "복원 전과 후 비교");
+    view.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { pos = Math.max(0, pos - .04); paint(); e.preventDefault(); }
+      if (e.key === "ArrowRight") { pos = Math.min(1, pos + .04); paint(); e.preventDefault(); }
+    });
+    paint();
+
+    fetch("assets/gallery.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.items || !d.items.length) throw new Error("no data");
+        d.items.forEach(function (it, i) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "gal-tab";
+          b.setAttribute("role", "tab");
+          b.setAttribute("aria-selected", i === 0 ? "true" : "false");
+          b.innerHTML = it.label + '<span class="c">' + it.restored + "/" + it.detected + "</span>";
+          b.addEventListener("click", function () { pick(it, b); });
+          tabs.appendChild(b);
+        });
+        pick(d.items[0], tabs.firstElementChild);
+
+        function pick(it, btn) {
+          [].forEach.call(tabs.children, function (x) {
+            x.setAttribute("aria-selected", String(x === btn));
+          });
+          imgA.src = "assets/gallery/" + it.key + "/after.png";
+          imgB.src = "assets/gallery/" + it.key + "/before.png";
+          document.getElementById("galLabel").textContent = it.label;
+          document.getElementById("galNote").textContent = it.note;
+          document.getElementById("galRestored").textContent = it.restored + "줄";
+          document.getElementById("galDetected").textContent = it.detected + "줄";
+          document.getElementById("galRefused").textContent = it.refused + "줄";
+          document.getElementById("galSecs").textContent = Math.round(it.seconds) + "초";
+          pos = 0.5; paint();
+        }
+      })
+      .catch(function () {
+        var g = document.getElementById("gal");
+        if (g) g.closest("section").style.display = "none";
+      });
+  })();
+})();
