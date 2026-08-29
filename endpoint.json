@@ -1,6 +1,6 @@
 {
-    "online":  true,
-    "api":  "https://incident-tablets-shepherd-michael.trycloudflare.com",
-    "updated":  "2026-08-29T14:34:29Z",
-    "note":  "복원 서버가 켜져 있습니다."
+  "online": true,
+  "api": "https://incident-tablets-shepherd-michael.trycloudflare.com",
+  "updated": "2026-08-30T00:00:00Z",
+  "note": "복원 서버가 켜져 있습니다."
 }

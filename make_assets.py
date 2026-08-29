@@ -294,3 +294,38 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# 랜딩 페이지용 «줄별 판정» 합성 이미지
+# ══════════════════════════════════════════════════════════════════════════
+def build_line_strip(out_dir: Path, dst: Path, rows: int = 5, width: int = 1200) -> None:
+    """줄별 판정 썸네일을 위아래로 붙여 «이렇게 줄 단위로 확인한다»를 보여 준다.
+
+    이 서비스가 파는 것은 «어디를 되살렸는지 줄 단위로 안다»는 점이다.
+    말로 하면 안 와닿으므로 실제 산출물을 그대로 보여 준다.
+    """
+    from PIL import Image, ImageDraw
+    src = out_dir / "텍스트판정"
+    files = sorted(src.glob("L*.png"))[:rows]
+    if not files:
+        print("   줄별 판정 이미지 없음 — 건너뜀")
+        return
+    ims = [Image.open(f).convert("RGB") for f in files]
+    pad, gap, label_h = 18, 12, 0
+    w = width
+    scaled = []
+    for im in ims:
+        k = min(1.0, (w - pad * 2) / im.width)
+        scaled.append(im.resize((int(im.width * k), int(im.height * k)), Image.LANCZOS))
+    h = pad * 2 + sum(i.height for i in scaled) + gap * (len(scaled) - 1)
+    canvas = Image.new("RGB", (w, h), (255, 255, 255))
+    d = ImageDraw.Draw(canvas)
+    y = pad
+    for im in scaled:
+        canvas.paste(im, (pad, y))
+        d.rectangle([pad - 1, y - 1, pad + im.width, y + im.height],
+                    outline=(228, 232, 230), width=1)
+        y += im.height + gap
+    canvas.save(dst, optimize=True)
+    print(f"   줄별 판정 {len(scaled)}줄 → {dst.name}")
