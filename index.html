@@ -93,25 +93,22 @@
       문제는 그 순간 글자가 <b style="color:var(--text)">도형 덩어리</b>가 되어
       되돌릴 수 없다는 것입니다.</p>
   </div>
-  <div class="grid g3 rv" style="margin-top:44px">
-    <article class="card prob">
-      <div class="ic"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4h14v2H3V4Zm0 5h9v2H3V9Zm0 5h9v2H3v-2Z"/><path d="M15.2 8.2 17 10l-1.2 1.2-1.8-1.8-1.8 1.8L11 10l1.8-1.8L11 6.4l1.2-1.2 1.8 1.8 1.8-1.8L17 6.4l-1.8 1.8Z"/></svg></div>
-      <div><h3>오타 하나에 견적이 붙습니다</h3>
-        <p class="small muted">전화번호 한 자리, 전성분 한 단어를 고치려고 원본 작업 파일을
-          다시 찾거나 처음부터 조판을 다시 짜야 합니다.</p></div>
-    </article>
-    <article class="card prob">
-      <div class="ic"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 0 0-5 5v1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-1V7a5 5 0 0 0-5-5Zm3 6H7V7a3 3 0 1 1 6 0v1Z"/></svg></div>
-      <div><h3>원본 파일이 없습니다</h3>
-        <p class="small muted">퇴사한 디자이너, 계약이 끝난 외주사, 사라진 하드디스크.
-          손에 남은 건 인쇄용 최종 파일 한 개뿐입니다.</p></div>
-    </article>
-    <article class="card prob">
-      <div class="ic"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1.8 1.5 17h17L10 1.8Zm.9 11.4H9.1V8h1.8v5.2Zm0 3H9.1v-1.8h1.8V16Z"/></svg></div>
-      <div><h3>다시 짜면 «비슷한» 파일이 됩니다</h3>
-        <p class="small muted">눈대중으로 다시 조판하면 자간·행간이 미묘하게 어긋납니다.
-          재인쇄본과 기존 인쇄본이 달라 보이는 사고가 여기서 납니다.</p></div>
-    </article>
+  <div class="plain3 rv">
+    <div>
+      <h3>오타 하나에 견적이 붙습니다</h3>
+      <p>전화번호 한 자리, 전성분 한 단어를 고치려고 원본 작업 파일을 다시 찾거나
+        처음부터 조판을 다시 짜야 합니다.</p>
+    </div>
+    <div>
+      <h3>원본 파일이 없습니다</h3>
+      <p>퇴사한 디자이너, 계약이 끝난 외주사, 사라진 하드디스크.
+        손에 남은 건 인쇄용 최종 파일 한 개뿐입니다.</p>
+    </div>
+    <div>
+      <h3>다시 짜면 «비슷한» 파일이 됩니다</h3>
+      <p>눈대중으로 다시 조판하면 자간·행간이 미묘하게 어긋납니다.
+        재인쇄본과 기존 인쇄본이 달라 보이는 사고가 여기서 납니다.</p>
+    </div>
   </div>
 </div></section>
 
@@ -304,60 +301,52 @@
       함께 드립니다. 압축 파일 하나에 아래가 전부 들어 있습니다.</p>
   </div>
 
-  <div class="getlist rv">
-    <div class="getrow">
+  <div class="slip rv">
+    <div class="slip-row">
       <span class="no">01</span>
-      <div class="body">
-        <h3>복원된 인쇄 파일</h3>
+      <div><h3>복원된 인쇄 파일</h3>
         <p>일러스트레이터에서 열어 글자를 더블클릭하면 바로 수정됩니다.
-          복원한 텍스트는 <b>별도 레이어</b>에 들어가 원본 요소와 구분됩니다.</p>
-      </div>
-      <figure><img src="assets/after.png" alt="복원된 파일" loading="lazy"></figure>
+          복원한 텍스트는 <b style="color:var(--text)">별도 레이어</b>에 들어가
+          원본 요소와 구분됩니다.</p></div>
+      <div class="files"><b>복원본.pdf</b><br>00_원본_&lt;파일명&gt;.pdf</div>
     </div>
-    <div class="getrow">
+    <div class="slip-row">
       <span class="no">02</span>
-      <div class="body">
-        <h3>검증 리포트 (PDF · 텍스트)</h3>
+      <div><h3>검증 리포트</h3>
         <p>줄별 복원 여부, 사용된 서체·크기·자간, 위치 오차 수치,
-          그리고 <b>복원하지 않은 줄과 그 이유</b>가 적혀 있습니다.</p>
-      </div>
-      <figure><img src="assets/report_thumb.png" alt="검증 리포트" loading="lazy"></figure>
+          그리고 <b style="color:var(--text)">복원하지 않은 줄과 그 이유</b>가 적혀 있습니다.
+          믿어달라고 하는 대신 확인하실 수 있게 하는 문서입니다.</p></div>
+      <div class="files"><b>검증리포트.pdf</b><br>검증리포트.md</div>
     </div>
-    <div class="getrow">
+    <div class="slip-row">
       <span class="no">03</span>
-      <div class="body">
-        <h3>겹쳐보기 검사 이미지</h3>
+      <div><h3>겹쳐보기 검사 이미지</h3>
         <p>원본 위에 복원본을 포개어 렌더링한 이미지입니다.
-          디자인이 바뀌지 않았다는 것을 <b>눈으로</b> 확인하실 수 있습니다.</p>
-      </div>
-      <figure><img src="assets/overlay.png" alt="겹쳐보기 검사 이미지" loading="lazy"></figure>
+          디자인이 바뀌지 않았다는 것을 <b style="color:var(--text)">눈으로</b> 확인하실 수 있습니다.
+          줄 단위 확대본도 함께 들어갑니다.</p></div>
+      <div class="files"><b>overlay.png</b><br>overlay_lines/</div>
     </div>
-    <div class="getrow">
+    <div class="slip-row">
       <span class="no">04</span>
-      <div class="body">
-        <h3>줄별 판정 목록</h3>
+      <div><h3>줄별 판정 목록</h3>
         <p>«이건 글자가 아니라 로고인데»를 잡으실 수 있게, 텍스트로 판정한 도형을
-          줄 단위 이미지로 전부 보여 드립니다.</p>
-      </div>
-      <figure><img src="assets/lines.png" alt="줄별 판정" loading="lazy"></figure>
+          줄 단위 이미지로 전부 보여 드립니다. 아니라고 알려 주시면 그 줄은 원본으로 되돌립니다.</p></div>
+      <div class="files"><b>텍스트판정목록.md</b><br>텍스트판정/</div>
     </div>
-    <div class="getrow">
+    <div class="slip-row">
       <span class="no">05</span>
-      <div class="body">
-        <h3>폰트 매니페스트</h3>
-        <p>어떤 서체를 썼고 <b>임베딩이 허용되는지</b> 적어 드립니다.
-          상용 폰트 파일은 결과물에 넣지 않습니다 — 이름과 구매 경로만 알려 드립니다.</p>
-      </div>
-      <figure><div class="filelist">
-        <b>복원본.pdf</b><br>
-        <b>검증리포트.pdf</b> · 검증리포트.md<br>
-        overlay.png · overlay_lines/<br>
-        텍스트판정/ · 텍스트판정목록.md<br>
-        <b>폰트매니페스트.txt</b><br>
-        00_원본_&lt;파일명&gt;.pdf
-      </div></figure>
+      <div><h3>폰트 매니페스트</h3>
+        <p>어떤 서체를 썼고 <b style="color:var(--text)">임베딩이 허용되는지</b> 적어 드립니다.
+          상용 폰트 파일은 결과물에 넣지 않습니다 — 이름과 구매 경로만 알려 드립니다.</p></div>
+      <div class="files"><b>폰트매니페스트.txt</b></div>
     </div>
+    <p class="slip-foot">
+      <span>압축 파일 <b>하나</b>로 받으십니다</span>
+      <span>보관 <b>72시간</b> · 즉시 삭제 가능</span>
+      <span>지금은 <b>무료 베타</b></span>
+    </p>
   </div>
+
   <p class="tiny muted rv" style="margin-top:18px">
     받으신 원본도 그대로 함께 넣어 드립니다. 비교하실 때 쓰시면 됩니다.</p>
 </div></section>
@@ -370,39 +359,28 @@
     <p class="lede">복원본을 원본 위에 정확히 포개어 렌더링한 뒤 픽셀이 어긋나는 곳을 찾습니다.
       아래는 실제 검사 이미지입니다.</p>
   </div>
-  <div class="proof-grid">
-    <div class="rv">
-      <figure class="frame" style="margin:0">
-        <img src="assets/overlay.png" alt="원본과 복원본을 겹친 검증 이미지" loading="lazy">
-      </figure>
-      <figure class="zoomcut">
-        <img src="assets/overlay_zoom.png" alt="겹쳐보기 이미지의 전성분 부분 확대" loading="lazy">
-        <figcaption>↑ 위 이미지의 「전성분」 부분을 확대한 것입니다.
-          어긋남이 <b>글자 가장자리에만</b> 남아 있습니다.</figcaption>
-      </figure>
-    </div>
-    <div class="rv">
-      <ul class="legend">
-        <li><span class="sw" style="background:#9AA09D"></span>
-          <div><b>회색 — 완전히 겹침</b><span>원본 도형과 복원된 글자가 같은 자리에 있습니다.</span></div></li>
-        <li><span class="sw" style="background:#E0736B"></span>
-          <div><b>붉은 테두리 — 원본에만 있는 픽셀</b><span>글자 외곽선 굵기 정도의 미세한 어긋남입니다.</span></div></li>
-        <li><span class="sw" style="background:#79C79E"></span>
-          <div><b>초록 테두리 — 복원본에만 있는 픽셀</b><span>같은 자리에서 반대 방향의 미세 차이입니다.</span></div></li>
-      </ul>
-      <div class="metrics">
-        <div><b>0.00pt</b><span>가로 위치 오차 최대</span></div>
-        <div><b>0.00pt</b><span>세로 위치 오차 최대</span></div>
-        <div><b>0.960</b><span>겹침 정확도 (1.000 = 완전 일치)</span></div>
-        <div><b>14 / 17</b><span>복원한 줄 / 검출한 줄</span></div>
-      </div>
-      <p class="tiny" style="color:var(--muted-d);margin-top:16px">
-        이 페이지의 모든 이미지와 수치는 저희가 만든 가상 샘플 라벨을 실제 복원 시스템에
-        통과시켜 나온 결과입니다. 연출하거나 손보지 않았고, 고객 파일도 아닙니다.
-        복원하지 않은 3줄은 삭제되지 않고 원본 도형 그대로 남아 있습니다.
-      </p>
-    </div>
+  <figure class="bleed rv" style="margin:0">
+    <img src="assets/overlay.png" alt="원본과 복원본을 겹친 검증 이미지" loading="lazy">
+    <figcaption><b>회색</b>은 완전히 겹친 곳, <b>붉고 푸른 테두리</b>는 어긋난 픽셀입니다.
+      어긋남이 글자 가장자리에만 남아 있으면 정상입니다.</figcaption>
+  </figure>
+
+  <figure class="bleed rv" style="margin-top:20px">
+    <img src="assets/overlay_zoom.png" alt="겹쳐보기 확대" loading="lazy">
+    <figcaption>위 이미지의 「전성분」 부분을 확대한 것입니다.</figcaption>
+  </figure>
+
+  <div class="metrics rv" style="grid-template-columns:repeat(2,1fr);margin-top:36px">
+    <div><b>0.00pt</b><span>가로 위치 오차 최대</span></div>
+    <div><b>0.00pt</b><span>세로 위치 오차 최대</span></div>
+    <div><b>0.960</b><span>겹침 정확도 (1.000 = 완전 일치)</span></div>
+    <div><b>14 / 17</b><span>복원한 줄 / 검출한 줄</span></div>
   </div>
+  <p class="tiny rv" style="color:var(--muted-d);margin-top:20px;max-width:76ch">
+    이 페이지의 모든 이미지와 수치는 저희가 만든 가상 샘플을 실제 복원 시스템에
+    통과시켜 나온 결과입니다. 연출하거나 손보지 않았고, 고객 파일도 아닙니다.
+    복원하지 않은 3줄은 삭제되지 않고 원본 도형 그대로 남아 있습니다.
+  </p>
 </div></section>
 
 <!-- ══════════ 못 하는 것 ══════════ -->
@@ -412,31 +390,20 @@
     <h2 class="h" style="margin-top:18px">이건 못 합니다.</h2>
     <p class="lede">파는 쪽이 먼저 말씀드리는 게 맞다고 생각합니다.</p>
   </div>
-  <div class="grid g2 rv" style="margin-top:36px">
-    <article class="card prob">
-      <div class="ic" style="background:#F6EFE3;color:#8A6A16"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M14.5 6.9 13.1 5.5 10 8.6 6.9 5.5 5.5 6.9 8.6 10l-3.1 3.1 1.4 1.4L10 11.4l3.1 3.1 1.4-1.4L11.4 10l3.1-3.1Z"/></svg></div>
-      <div><h3>100% 복원은 약속하지 않습니다</h3>
-        <p class="small muted">서체를 확정하지 못한 줄은 일부러 손대지 않습니다.
-          몇 줄이 되살아나는지는 <b>돌려본 뒤 숫자로</b> 알려 드립니다.</p></div>
-    </article>
-    <article class="card prob">
-      <div class="ic" style="background:#F6EFE3;color:#8A6A16"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M14.5 6.9 13.1 5.5 10 8.6 6.9 5.5 5.5 6.9 8.6 10l-3.1 3.1 1.4 1.4L10 11.4l3.1 3.1 1.4-1.4L11.4 10l3.1-3.1Z"/></svg></div>
-      <div><h3>스캔 이미지·JPG는 안 됩니다</h3>
-        <p class="small muted">글자 도형 정보가 아예 없기 때문입니다.
-          <b>.ai 또는 .pdf</b>여야 하고, «PDF 호환 파일 만들기»가 켜져 있어야 합니다.</p></div>
-    </article>
-    <article class="card prob">
-      <div class="ic" style="background:#F6EFE3;color:#8A6A16"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M14.5 6.9 13.1 5.5 10 8.6 6.9 5.5 5.5 6.9 8.6 10l-3.1 3.1 1.4 1.4L10 11.4l3.1 3.1 1.4-1.4L11.4 10l3.1-3.1Z"/></svg></div>
-      <div><h3>상용 폰트 파일은 못 드립니다</h3>
-        <p class="small muted">폰트 파일은 법으로 프로그램처럼 보호됩니다.
-          배포가 허용된 서체로 대체 임베딩하거나, 보유하신 정품으로 열리게 만듭니다.</p></div>
-    </article>
-    <article class="card prob">
-      <div class="ic" style="background:#F6EFE3;color:#8A6A16"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M14.5 6.9 13.1 5.5 10 8.6 6.9 5.5 5.5 6.9 8.6 10l-3.1 3.1 1.4 1.4L10 11.4l3.1 3.1 1.4-1.4L11.4 10l3.1-3.1Z"/></svg></div>
-      <div><h3>기계 검사만으로 출고하지 않습니다</h3>
-        <p class="small muted">인쇄에 넘기시기 전에 <b>일러스트레이터로 한 번 열어</b>
-          확인해 주세요. 저희 경험상 그 확인에서만 잡히는 문제가 있었습니다.</p></div>
-    </article>
+  <div class="plain3 rv" style="grid-template-columns:repeat(2,1fr)">
+    <div><h3>100% 복원은 약속하지 않습니다</h3>
+      <p>서체를 확정하지 못한 줄은 일부러 손대지 않습니다.
+        몇 줄이 되살아나는지는 <b style="color:var(--text)">돌려본 뒤 숫자로</b> 알려 드립니다.</p></div>
+    <div><h3>스캔 이미지·JPG는 안 됩니다</h3>
+      <p>글자 도형 정보가 아예 없기 때문입니다.
+        <b style="color:var(--text)">.ai 또는 .pdf</b>여야 하고,
+        «PDF 호환 파일 만들기»가 켜져 있어야 합니다.</p></div>
+    <div><h3>상용 폰트 파일은 못 드립니다</h3>
+      <p>폰트 파일은 법으로 프로그램처럼 보호됩니다.
+        배포가 허용된 서체로 대체 임베딩하거나, 보유하신 정품으로 열리게 만듭니다.</p></div>
+    <div><h3>기계 검사만으로 출고하지 않습니다</h3>
+      <p>인쇄에 넘기시기 전에 <b style="color:var(--text)">일러스트레이터로 한 번 열어</b>
+        확인해 주세요. 저희 경험상 그 확인에서만 잡히는 문제가 있었습니다.</p></div>
   </div>
 </div></section>
 
