@@ -645,14 +645,20 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
 .strip-row{transition:background .35s ease}
 .strip-row.hot{background:var(--accent-soft)}
 .strip-row.hot .n{color:var(--accent)}
-.slip-row{transition:background .3s ease,padding-left .3s ease}
-.slip-row.hot{background:var(--paper-2)}
-@media(min-width:820px){.slip-row.hot{padding-left:14px}}
-.rv-stagger > *{opacity:0;transform:translateY(16px)}
-.rv-stagger.in > *{opacity:1;transform:none;
-  transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+/* 배경 전체를 칠하면 «표에서 선택된 행» 처럼 보인다. 왼쪽 표시만 남긴다. */
+.slip-row{position:relative;transition:padding-left .3s ease}
+.slip-row::before{content:"";position:absolute;left:-16px;top:26px;bottom:26px;width:3px;
+  background:var(--accent);opacity:0;transition:opacity .3s ease}
+.slip-row.hot::before{opacity:1}
+@media(min-width:820px){.slip-row.hot{padding-left:10px}}
+/* ⚠ 순차 등장은 «숨기는 장치를 하나 더» 만들면 안 된다.
+   .rv 와 겹쳐 두었더니 관찰자가 안 돌 때 섹션이 통째로 사라졌다 (2026-08-30 실제 발생).
+   그래서 기존 .rv 하나에 얹는다 — .rv 가 걷히면 자식도 자동으로 보인다. */
+.js .rv[data-stagger] > *{opacity:0;transform:translateY(16px)}
+.js .rv[data-stagger].in > *{opacity:1;transform:none;
+  transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
 @media(prefers-reduced-motion:reduce){
   .par{transform:none!important}
   .strip-row.hot,.slip-row.hot{background:transparent}
-  .rv-stagger > *{opacity:1;transform:none}
+  .js .rv[data-stagger] > *{opacity:1;transform:none}
 }

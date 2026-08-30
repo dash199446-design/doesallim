@@ -104,11 +104,24 @@
         el.addEventListener("transitionend", function h(ev) {
           if (ev.propertyName !== "opacity") return;
           el.removeEventListener("transitionend", h);
-          el.classList.remove("rv", "in");
+          // 순차 등장 컨테이너는 자식이 다 나타난 뒤에 걷어야 한다.
+          // 먼저 걷으면 남은 자식이 튀어나온다.
+          var wait = el.hasAttribute("data-stagger")
+            ? 80 * el.children.length + 600 : 0;
+          setTimeout(function () { el.classList.remove("rv", "in"); }, wait);
         });
       });
     }, { threshold: .1, rootMargin: "0px 0px -40px" });
     els.forEach(function (el) { io.observe(el); });
+
+    // ★ 안전장치 — 관찰자가 안 돌거나 늦으면 내용이 영영 숨는다.
+    //   실제로 한 번 그렇게 섹션이 통째로 비어 나갔다 (2026-08-30).
+    //   6초가 지나면 이유를 따지지 않고 전부 보이게 한다.
+    setTimeout(function () {
+      document.querySelectorAll(".rv:not(.in)").forEach(function (el) {
+        el.classList.add("in");
+      });
+    }, 6000);
   })();
 })();
 
@@ -315,21 +328,16 @@
       hot.observe(el);
     });
 
-    /* ── 목록은 한 줄씩 차례로 나타난다 ──────────────────────────── */
-    document.querySelectorAll(".plain3, .slip, .gal-tabs").forEach(function (g) {
-      g.classList.add("rv-stagger");
+    /* ── 목록은 한 줄씩 차례로 나타난다 ────────────────────────────
+       기존 .rv 관찰자에 얹는다. 별도 관찰자를 두면 숨기는 장치가 둘이 되고,
+       하나만 안 돌아도 내용이 사라진다. */
+    // data-stagger 는 HTML 에 적어 둔다. 여기서 클래스를 붙이면 이미 지나간
+    // 관찰자가 그 요소를 못 보고, 내용이 영영 숨는다.
+    document.querySelectorAll("[data-stagger]").forEach(function (g) {
       [].forEach.call(g.children, function (c, i) {
         c.style.transitionDelay = (i * 70) + "ms";
       });
     });
-    var st = new IntersectionObserver(function (es) {
-      es.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        st.unobserve(en.target);
-        en.target.classList.add("in");
-      });
-    }, { threshold: .15 });
-    document.querySelectorAll(".rv-stagger").forEach(function (g) { st.observe(g); });
 
     /* ── 판정 막대는 화면에 들어올 때 한 번 채워진다 ─────────────── */
     var pb = document.getElementById("probeBars");
