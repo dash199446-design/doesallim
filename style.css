@@ -349,10 +349,11 @@ section[id]{scroll-margin-top:78px}
 footer{background:var(--ink);color:var(--muted-d);border-top:1px solid var(--line-d);
   padding-block:44px;font-size:13.6px}
 footer .cols{display:grid;gap:26px}
-@media(min-width:800px){footer .cols{grid-template-columns:1.4fr 1fr 1fr}}
+@media(min-width:800px){footer .cols{grid-template-columns:1.5fr 1fr 1fr 1fr}}
 footer h4{font-size:13px;color:#fff;margin-bottom:11px;letter-spacing:0}
 footer a{color:var(--muted-d);text-decoration:none;display:block;padding:3px 0}
 footer a:hover{color:#fff}
+footer .cols span[data-mail-text]{display:block;padding:3px 0}
 footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d);
   font-size:12.6px;line-height:1.8}
 
@@ -766,3 +767,40 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
   .lab .g::before,.lab .g::after{opacity:0}
   .lab .caret{animation:none}
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   법률 문서 페이지 (이용약관 · 개인정보처리방침)
+   읽기 위한 페이지다. 장식을 넣지 않고 글줄과 여백만 다룬다.
+   ═══════════════════════════════════════════════════════════════════ */
+.legal{max-width:820px;padding-block:clamp(40px,6vw,72px)}
+.legal .meta{font-size:13.6px;color:var(--muted);margin-top:14px;
+  display:flex;gap:8px 22px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.legal h1{font-size:clamp(30px,4vw,44px);letter-spacing:-.04em;line-height:1.18}
+.legal h2{font-size:clamp(19px,2.1vw,23px);letter-spacing:-.03em;margin:52px 0 14px;
+  padding-top:22px;border-top:2px solid var(--ink)}
+.legal h3{font-size:16.5px;margin:26px 0 8px}
+.legal p{font-size:15.6px;line-height:1.85;color:#2A3330;margin:12px 0}
+.legal ol,.legal ul{font-size:15.6px;line-height:1.85;color:#2A3330;
+  padding-left:22px;margin:12px 0}
+.legal li{margin:7px 0}
+.legal li > ol,.legal li > ul{margin:6px 0}
+.legal b,.legal strong{color:var(--text)}
+.legal table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.4px}
+.legal th,.legal td{border:1px solid var(--line);padding:11px 13px;text-align:left;
+  vertical-align:top;line-height:1.6}
+.legal th{background:var(--paper-2);font-weight:700;white-space:nowrap}
+.legal .callout{border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:18px 20px;border-radius:0 var(--r) var(--r) 0;margin:22px 0;font-size:15px;
+  line-height:1.78}
+.legal .callout.warn{border-left-color:#C99A21;background:#FDF8EC}
+.legal .callout b{display:block;margin-bottom:6px}
+.legal .toc{border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;
+  margin:32px 0;background:var(--paper-2)}
+.legal .toc b{display:block;font-size:14px;margin-bottom:10px}
+.legal .toc ol{margin:0;font-size:14.6px;columns:2;column-gap:34px}
+@media(max-width:640px){.legal .toc ol{columns:1}}
+.legal .toc a{color:var(--muted);text-decoration:none}
+.legal .toc a:hover{color:var(--accent);text-decoration:underline}
+.legal .back{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;
+  color:var(--muted);text-decoration:none;margin-top:44px}
+.legal .back:hover{color:var(--accent)}

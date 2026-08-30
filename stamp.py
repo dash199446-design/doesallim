@@ -21,7 +21,7 @@ import re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PAGES = ("index.html", "restore.html")
+PAGES = ("index.html", "restore.html", "terms.html", "privacy.html")
 ASSETS = ("style.css", "landing.js", "restore.js")
 
 

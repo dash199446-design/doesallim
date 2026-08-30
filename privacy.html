@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>개인정보 처리방침 — Typeback</title>
+<meta name="description" content="Typeback 이 어떤 정보를 수집하고, 어떻게 쓰고, 언제 지우는지 적어 둔 문서입니다.">
+<meta name="theme-color" content="#0B1210">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect width='48' height='48' rx='11' fill='%230B1210'/><path d='M12.5 15h23v5.4h-8.7V35h-5.6V20.4h-8.7V15Z' fill='%234A5257'/><path d='M13.8 13h23v5.4h-8.7V33h-5.6V18.4h-8.7V13Z' fill='none' stroke='%2343D9A3' stroke-width='1.7'/></svg>">
+<script>document.documentElement.className+=' js'</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all';this.onload=null"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<noscript><link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript>
+<link rel="stylesheet" href="style.css?v=89ed5990">
+</head>
+<body>
+
+<header class="nav" id="nav"><div class="wrap">
+  <a class="brand" href="./">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#0B1210"/><path d="M12.5 15h23v5.4h-8.7V35h-5.6V20.4h-8.7V15Z" fill="#4A5257"/><path d="M13.8 13h23v5.4h-8.7V33h-5.6V18.4h-8.7V13Z" fill="none" stroke="#43D9A3" stroke-width="1.7"/></svg>
+    <span>typeback</span><span class="kr">아웃라인 텍스트 복원</span>
+  </a>
+  <nav class="navlinks"><a href="./">서비스 소개</a><a href="terms.html">이용약관</a></nav>
+  <div class="spacer"></div>
+  <a class="btn btn-p sm" href="restore.html">복원하러 가기</a>
+</div></header>
+
+<main><section class="legal"><div class="wrap" style="max-width:820px">
+
+  <h1>개인정보 처리방침</h1>
+  <p class="meta">
+    <span>시행일 2026-08-30</span><span>버전 1.0</span>
+    <span>무료 베타 운영 기준</span>
+  </p>
+
+  <div class="callout">
+    <b>먼저 밝혀 둡니다</b>
+    이 서비스는 대부분 <b>아직 공개되지 않은 인쇄물 디자인</b>을 다룹니다. 그 파일은
+    개인정보라기보다 고객의 <b>영업비밀</b>이며, 저희는 개인정보와 같거나 그 이상으로
+    엄격하게 다룹니다. 이 문서에는 <b>실제로 하고 있는 일만</b> 적었습니다 —
+    개인정보 처리방침은 사실과 다르게 쓰는 것 자체가 위법이기 때문입니다.
+  </div>
+
+  <div class="toc">
+    <b>목차</b>
+    <ol>
+      <li><a href="#c1">수집하는 정보</a></li>
+      <li><a href="#c2">이용 목적</a></li>
+      <li><a href="#c3">파일이 지나가는 경로</a></li>
+      <li><a href="#c4">보관과 파기</a></li>
+      <li><a href="#c5">제3자 제공과 위탁</a></li>
+      <li><a href="#c6">이용자의 권리</a></li>
+      <li><a href="#c7">안전조치</a></li>
+      <li><a href="#c8">쿠키·자동 수집</a></li>
+      <li><a href="#c9">문의처</a></li>
+      <li><a href="#c10">변경 이력</a></li>
+    </ol>
+  </div>
+
+  <h2 id="c1">1. 수집하는 정보</h2>
+
+  <h3>1-1. 웹사이트에서 복원을 신청하실 때</h3>
+  <table>
+    <tr><th>구분</th><th>항목</th><th>목적</th><th>필수</th></tr>
+    <tr><td>업로드 파일</td><td>고객이 올린 <code>.ai</code> · PDF 파일</td>
+        <td>복원 작업 수행</td><td>필수</td></tr>
+    <tr><td>작업 기록</td><td>작업 식별자, 접수·완료 시각, 처리 단계, 라인 수, 서체 판정 결과, 오차 수치</td>
+        <td>진행 표시, 결과 리포트 작성, 장애 대응</td><td>필수</td></tr>
+    <tr><td>접속 정보</td><td>접속 IP 를 <b>해시로 변환한 값</b>, 접속 시각</td>
+        <td>과도한 요청 차단(레이트 리밋)</td><td>필수</td></tr>
+  </table>
+
+  <div class="callout">
+    <b>회원가입이 없습니다</b>
+    이름, 이메일, 전화번호, 주소를 <b>받지 않습니다.</b> 로그인도 없습니다.
+    작업은 발급된 무작위 식별자와 토큰으로만 구분합니다.
+  </div>
+
+  <h3>1-2. 이메일이나 다른 경로로 문의하실 때</h3>
+  <p>고객이 직접 알려 주시는 범위 — 성함 또는 상호, 회신 받을 연락처, 문의 내용 —
+    만 남습니다. 문의 응대와 그 기록 외의 목적으로 쓰지 않습니다.</p>
+
+  <h3>1-3. 파일 안에 들어 있는 개인정보</h3>
+  <p>고객 파일에는 담당자 이름·전화번호·주소 같은 개인정보가 들어 있을 수 있습니다.
+    저희는 그 내용을 <b>복원 작업 목적으로만</b> 처리하며, 따로 뽑아내거나 저장하지 않고,
+    아래 4항의 파기 정책에 따라 지웁니다.</p>
+
+  <h3>1-4. 결제 정보</h3>
+  <p><b>현재 무료 베타 기간이라 요금을 받지 않으며, 결제 수단 정보를 일절 수집하지 않습니다.</b>
+    카드번호·계좌번호를 입력받는 화면 자체가 없습니다. 유료 전환 시에는 이 문서를 먼저 갱신하고
+    시행일 전에 공지합니다.</p>
+
+  <h2 id="c2">2. 이용 목적</h2>
+  <ol>
+    <li>복원 작업의 수행과 결과물·검증 리포트 제공</li>
+    <li>진행 상황 표시, 오류 대응, 장애 원인 파악</li>
+    <li>과도한 요청으로 서비스가 마비되지 않도록 하는 접근 제한</li>
+    <li>법령상 보존 의무가 있는 경우 그 이행</li>
+  </ol>
+  <div class="callout warn">
+    <b>다음 목적으로는 쓰지 않습니다</b>
+    · 광고·마케팅 발송 &nbsp; · <b>AI 모델 학습</b> &nbsp; · 제3자 제공·판매
+    &nbsp; · 포트폴리오·홍보 게재<br>
+    이 사이트에 쓰인 모든 예시 이미지는 저희가 직접 만든 가상의 샘플입니다.
+  </div>
+
+  <h2 id="c3">3. 파일이 지나가는 경로</h2>
+  <p>어디를 거쳐 어디에 저장되는지 그대로 적습니다.</p>
+  <ol>
+    <li><b>진단 단계 — 파일이 전송되지 않습니다.</b> 복원 대상인지 확인하는 첫 단계는
+      고객의 <b>브라우저 안에서만</b> 실행됩니다. 이때 파일은 고객 컴퓨터를 벗어나지 않습니다.</li>
+    <li><b>복원 단계 — 이때부터 전송됩니다.</b> 고객이 「복원 시작」을 직접 누르면
+      파일이 저희 서버로 전송됩니다.</li>
+    <li><b>복원은 국내에 있는 운영자 PC 에서 수행됩니다.</b> 해외 클라우드에 올리지 않습니다.</li>
+    <li><b>외부 AI API 로 내보내지 않습니다.</b> 복원에 쓰는 계산은 전부 이 서버 안에서
+      이루어집니다. 외부 전송 경로는 꺼져 있으며, 그 상태는
+      <code>/api/health</code> 응답으로 확인하실 수 있습니다.</li>
+  </ol>
+
+  <div class="callout warn">
+    <b>전송 구간에 관한 고지 — Cloudflare</b>
+    저희 서버는 공인 IP 를 직접 열지 않고 <b>Cloudflare Tunnel</b>(Cloudflare, Inc., 미국)을
+    통해 외부와 연결됩니다. 따라서 고객이 업로드·다운로드하는 트래픽은
+    <b>Cloudflare 의 네트워크를 경유</b>합니다. 전 구간은 HTTPS 로 암호화되지만,
+    경유 사업자가 존재한다는 사실을 숨기지 않고 밝힙니다.<br><br>
+    저장은 국내(운영자 PC)에서만 이루어지며 Cloudflare 는 파일을 보관하지 않습니다.
+    이 경로가 부담되시면 <b>파일을 웹에 올리지 마시고</b> 직접 문의해 주십시오 —
+    다른 전달 방법을 협의해 드립니다.
+  </div>
+
+  <h2 id="c4">4. 보관과 파기</h2>
+  <table>
+    <tr><th>대상</th><th>보관 기간</th><th>비고</th></tr>
+    <tr><td>업로드 원본, 복원 결과물</td><td><b>72시간</b></td>
+        <td>자동 삭제. 결과 화면의 버튼으로 <b>즉시 삭제</b> 가능</td></tr>
+    <tr><td>고객이 제공한 폰트 파일(BYOF)</td><td><b>작업 종료 직후 즉시</b></td>
+        <td>보관하지 않음. 폰트 라이브러리에 편입하지 않음</td></tr>
+    <tr><td>작업 로그(수치 메타데이터)</td><td>최대 1년</td>
+        <td>파일 내용은 담기지 않음. 라인 수·시간·오차 수치만</td></tr>
+    <tr><td>마켓플레이스 주문 관련 파일</td><td>최대 30일</td>
+        <td>플랫폼 정책상 분쟁 대응 목적. <b>해당 주문에만</b> 적용</td></tr>
+  </table>
+  <p>파기는 복구가 불가능한 방법으로 수행합니다. 즉시 삭제를 요청하시면 그날 처리하고
+    처리 사실을 알려 드립니다. 다만 즉시 삭제 후에는 수정 요청 시 파일을 다시 보내셔야 합니다.</p>
+
+  <h2 id="c5">5. 제3자 제공과 위탁</h2>
+  <h3>5-1. 제3자 제공</h3>
+  <p>개인정보를 제3자에게 제공하지 않습니다. 다만 (1) 고객이 미리 동의한 경우,
+    (2) 법령에 규정이 있거나 수사기관이 법령에 정한 절차와 방법에 따라 요구하는 경우는 예외입니다.</p>
+
+  <h3>5-2. 처리 위탁 현황</h3>
+  <p>현재 실제로 쓰는 것만 적습니다. 늘거나 줄면 이 표를 먼저 고칩니다.</p>
+  <table>
+    <tr><th>수탁자</th><th>위탁 업무</th><th>보유·이용</th><th>소재</th></tr>
+    <tr><td>Cloudflare, Inc.</td><td>외부 접속 터널링(트래픽 중계)</td>
+        <td>중계 시점에 한함. 파일 보관 없음</td><td>미국</td></tr>
+    <tr><td>GitHub, Inc.</td><td>웹사이트(정적 페이지) 호스팅</td>
+        <td>접속 로그는 GitHub 정책에 따름</td><td>미국</td></tr>
+  </table>
+  <p>웹사이트 페이지 자체는 GitHub Pages 에서 제공되지만,
+    <b>고객 파일은 GitHub 에 올라가지 않습니다.</b> 파일은 위 3항의 경로로만 전송됩니다.</p>
+  <p>마켓플레이스(크몽·숨고 등)나 결제대행사는 <b>현재 사용하지 않습니다.</b>
+    사용을 시작하면 이 표에 추가하고 시행일 전에 공지합니다.</p>
+
+  <h2 id="c6">6. 이용자의 권리</h2>
+  <ol>
+    <li>업로드한 파일과 결과물의 <b>즉시 삭제</b>를 요청하실 수 있습니다.
+      결과 화면의 「지금 서버에서 삭제」 버튼으로 직접 하실 수 있고, 문의로도 가능합니다.</li>
+    <li>처리 현황의 열람, 정정, 처리 정지를 요청하실 수 있습니다.</li>
+    <li>회원가입이 없으므로 별도의 탈퇴 절차는 없습니다.
+      파일을 삭제하면 저희에게 남는 것은 파일 내용이 없는 수치 로그뿐입니다.</li>
+    <li>개인정보 침해로 도움이 필요하시면 아래 기관에 문의하실 수 있습니다.
+      <ul>
+        <li>개인정보 침해신고센터 (privacy.kisa.or.kr / 국번없이 118)</li>
+        <li>개인정보 분쟁조정위원회 (kopico.go.kr / 1833-6972)</li>
+        <li>대검찰청 사이버수사과 (spo.go.kr / 1301)</li>
+        <li>경찰청 사이버수사국 (ecrm.police.go.kr / 182)</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2 id="c7">7. 안전조치</h2>
+  <ol>
+    <li>전송 구간 전체를 HTTPS 로 암호화합니다.</li>
+    <li>복원 서버는 외부에 직접 열려 있지 않습니다. 터널을 통해서만 닿습니다.</li>
+    <li>과도한 요청을 막는 접근 제한을 둡니다. 접속 IP 는 <b>해시로 변환해서만</b> 저장합니다.</li>
+    <li>작업 로그에 파일 내용을 기록하지 않습니다.</li>
+    <li>보관 기간이 지난 파일을 자동으로 지우는 절차가 15분마다 실행됩니다.</li>
+    <li>운영은 현재 1인 체제이며, 접근 권한을 가진 사람은 운영자 본인뿐입니다.</li>
+  </ol>
+
+  <h2 id="c8">8. 쿠키·자동 수집</h2>
+  <p>이 웹사이트는 <b>쿠키를 사용하지 않습니다.</b> 광고·분석 도구를 넣지 않았고,
+    방문자를 추적하지 않습니다. 브라우저 저장소도 쓰지 않습니다.</p>
+  <p>복원 서버는 접근 제한을 위해 접속 IP 를 <b>해시로 변환한 값</b>과 시각을 기록합니다.
+    원본 IP 는 저장하지 않습니다.</p>
+
+  <h2 id="c9">9. 문의처</h2>
+  <p>개인정보 보호책임자 — <b>(준비 중)</b><br>
+    문의 이메일 — <b data-mail-text>준비 중</b></p>
+  <div class="callout warn">
+    <b>지금은 문의 이메일이 준비 중입니다</b>
+    개설되는 대로 이 자리와 사이트 하단에 공개합니다. 그 전에 삭제나 열람이 필요하시면
+    복원 결과 화면의 <b>「지금 서버에서 삭제」</b> 버튼을 이용해 주십시오 —
+    문의 없이도 직접 지우실 수 있습니다.
+  </div>
+
+  <h2 id="c10">10. 변경 이력</h2>
+  <table>
+    <tr><th>버전</th><th>시행일</th><th>내용</th></tr>
+    <tr><td>1.0</td><td>2026-08-30</td><td>최초 시행 (무료 베타 · 웹 접수 기준)</td></tr>
+  </table>
+  <p>내용이 바뀌면 시행일 7일 전(고객에게 불리한 변경은 30일 전)부터 이 페이지에 공지합니다.</p>
+
+  <a class="back" href="./">← 서비스 소개로 돌아가기</a>
+
+</div></section></main>
+
+<footer><div class="wrap">
+  <div class="cols">
+    <div>
+      <a class="brand" href="./" style="color:#fff">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#1D2624"/><path d="M12.5 15h23v5.4h-8.7V35h-5.6V20.4h-8.7V15Z" fill="#4A5257"/><path d="M13.8 13h23v5.4h-8.7V33h-5.6V18.4h-8.7V13Z" fill="none" stroke="#43D9A3" stroke-width="1.7"/></svg>
+        <span>typeback</span>
+      </a>
+      <p style="margin-top:12px;max-width:38ch">아웃라인 처리된 인쇄용 파일의 텍스트를
+        원래 조판 그대로 되살립니다.</p>
+    </div>
+    <div><h4>서비스</h4>
+      <a href="./#ai">AI가 하는 일</a><a href="./#deliver">받으실 것</a>
+      <a href="restore.html">복원하러 가기</a></div>
+    <div><h4>약관</h4>
+      <a href="terms.html">이용약관</a>
+      <a href="privacy.html">개인정보 처리방침</a></div>
+    <div><h4>문의</h4>
+      <span data-mail-text>문의 이메일 준비 중</span>
+      <a href="./#faq">자주 묻는 질문</a></div>
+  </div>
+  <div class="legal">
+    상호 (준비 중) · 대표자 (준비 중) · 사업자등록번호 (준비 중) · 통신판매업 신고번호 (준비 중)<br>
+    주소 (준비 중) · 문의 <span data-mail-text>준비 중</span>
+  </div>
+</div></footer>
+
+<script src="landing.js?v=404ae554" defer></script>
+</body>
+</html>
