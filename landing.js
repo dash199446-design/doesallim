@@ -386,103 +386,159 @@
 })();
 
 /* ═══════════════════════════════════════════════════════════════════════
-   히어로 — 글자가 되살아나는 과정 (2026-08-30)
+   히어로 오른쪽 — 살아 움직이는 라벨 (2026-08-30)
 
-   왼쪽 상태(윤곽선 + 앵커점)가 오른쪽 상태(채워진 글자)로 한 글자씩 넘어간다.
-   글자마다 겹침 점수를 같이 띄운다 — 이 점수는 실제 판정 데이터(probe.json)에서
-   가져온다. 없는 글자는 애니메이션만 하고 점수는 비운다. 숫자를 지어내지 않는다.
+   세 단계를 돌린다.
+     ① 도형          모든 글자가 윤곽선 + 앵커점. 채움이 없다.
+     ② 되살아남       한 글자씩 진짜 글자로 채워진다.
+     ③ 고칠 수 있음   전화번호가 실제로 새 번호로 바뀐다 (지우고 다시 친다).
 
-   멈추는 조건: 화면 밖 / prefers-reduced-motion / 탭이 안 보일 때.
+   ※ 이건 «무엇을 할 수 있는가» 를 보여 주는 시연이다. 측정 결과가 아니므로
+     여기에 정확도 수치를 붙이지 않는다 — 실측치는 아래 섹션들에 있다.
+   ※ 화면 밖·탭 비활성·reduced-motion 이면 돌지 않는다.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   "use strict";
-  var box = document.getElementById("revive"),
-      line = document.getElementById("reviveLine"),
-      state = document.getElementById("reviveState"),
-      score = document.getElementById("reviveScore");
-  if (!box || !line) return;
-
-  var TEXT = "수분 진정 토너";
-  var chars = [];
-  TEXT.split("").forEach(function (c) {
-    var el = document.createElement("span");
-    el.className = (c === " ") ? "ch sp" : "ch";
-    el.textContent = c;
-    line.appendChild(el);
-    chars.push({ el: el, c: c });
-  });
+  var lab = document.getElementById("lab"),
+      shot = lab && lab.closest(".shot"),
+      state = document.getElementById("labState");
+  if (!lab) return;
 
   var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* 각 줄을 글자 단위로 쪼갠다. data-edit 이 있으면 «고칠 부분» 을 따로 만든다. */
+  var lines = [];
+  [].forEach.call(lab.querySelectorAll("[data-t]"), function (el) {
+    var glyphs = [];
+    function put(str, into) {
+      str.split("").forEach(function (c) {
+        var g = document.createElement("span");
+        g.className = (c === " ") ? "g sp" : "g";
+        g.textContent = c;
+        into.appendChild(g);
+        glyphs.push(g);
+      });
+    }
+    el.textContent = "";
+    put(el.getAttribute("data-t"), el);
+
+    var edit = el.getAttribute("data-edit");
+    if (edit) {
+      var parts = edit.split("|");
+      var holder = document.createElement("span");
+      holder.className = "editable";
+      el.appendChild(holder);
+      put(parts[0], holder);
+      el.__edit = { holder: holder, from: parts[0], to: parts[1] };
+    }
+    lines.push({ el: el, glyphs: glyphs });
+  });
+
+  var all = lines.reduce(function (a, l) { return a.concat(l.glyphs); }, []);
+  var editLine = lines.filter(function (l) { return l.el.__edit; })[0];
+
   if (RM) {
-    chars.forEach(function (x) { x.el.classList.add("on"); });
-    state.textContent = "복원 완료 — 편집할 수 있는 텍스트";
+    all.forEach(function (g) { g.classList.add("on"); });
+    if (state) state.textContent = "복원 후에는 글자를 직접 고치실 수 있습니다";
     return;
   }
 
-  // 화면에 쓰는 바로 그 줄의 «실제» 판정 결과를 읽어 온다.
-  // 다른 글자의 점수를 빌려 오거나 그럴듯한 숫자를 지어내지 않는다.
-  var scores = {}, fontName = "";
-  fetch("assets/hero.json", { cache: "no-store" })
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (d) {
-      if (!d) return;
-      fontName = String(d.font || "").replace(/\.(otf|ttf)$/i, "");
-      (d.glyphs || []).forEach(function (g) { scores[g.ch] = g.iou; });
-    })
-    .catch(function () { /* 없으면 점수 없이 돈다 */ });
+  var timers = [], visible = false;
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function stop() { timers.forEach(clearTimeout); timers = []; }
 
-  var timer = null, visible = false;
-
-  function reset() {
-    box.classList.remove("done");
-    chars.forEach(function (x) { x.el.classList.remove("on", "now"); });
-    state.textContent = "도형 — 편집할 수 없음";
-    score.textContent = "";
+  function say(txt, live) {
+    if (state) state.textContent = txt;
+    if (shot) shot.classList.toggle("is-live", !!live);
   }
 
-  function play() {
-    reset();
-    var i = 0;
+  function reset() {
+    stop();
+    all.forEach(function (g) { g.classList.remove("on", "now"); });
+    if (editLine) {
+      var e = editLine.el.__edit;
+      e.holder.classList.remove("edit");
+      e.holder.textContent = "";
+      e.from.split("").forEach(function (c) {
+        var g = document.createElement("span");
+        g.className = (c === " ") ? "g sp" : "g";
+        g.textContent = c;
+        e.holder.appendChild(g);
+      });
+      editLine.glyphs = editLine.glyphs.filter(function (g) {
+        return g.parentNode !== e.holder;
+      }).concat([].slice.call(e.holder.children));
+    }
+    say("아웃라인 처리된 상태 — 글자가 전부 도형입니다", false);
+  }
+
+  /* ② 되살아남 — 위에서 아래로, 줄마다 조금씩 빠르게 */
+  function revive(done) {
+    var i = 0, seq = [];
+    lines.forEach(function (l) {
+      [].forEach.call(l.el.querySelectorAll(".g"), function (g) { seq.push(g); });
+    });
+    say("글자를 맞히는 중… 서체와 크기를 역산합니다", false);
     (function step() {
-      if (!visible) { timer = null; return; }
-      if (i > 0) chars[i - 1].el.classList.remove("now");
-      if (i >= chars.length) {
-        box.classList.add("done");
-        state.textContent = "복원 완료 — 편집할 수 있는 텍스트";
-        score.textContent = fontName ? fontName : "";
-        timer = setTimeout(play, 2600);
-        return;
-      }
-      var x = chars[i];
-      x.el.classList.add("now");
-      state.textContent = "글자를 맞히는 중…";
-      // 점수를 아는 글자만 숫자를 띄운다. 공백 등에서 비우면 깜빡이므로
-      // 모르는 글자는 직전 표시를 그대로 둔다.
-      var s = scores[x.c];
-      if (s != null) score.textContent = x.c + "  " + s.toFixed(4);
-      setTimeout(function () {
-        x.el.classList.add("on");
-      }, 130);
-      i += 1;
-      timer = setTimeout(step, 230);
+      if (!visible) return;
+      if (i >= seq.length) { say("되살렸습니다 — 이제 진짜 텍스트입니다", true); later(done, 900); return; }
+      var n = Math.max(1, Math.round(seq.length / 46));   // 전체가 ~2.6초에 끝나게
+      for (var k = 0; k < n && i < seq.length; k++, i++) seq[i].classList.add("on");
+      later(step, 56);
     })();
   }
 
-  function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+  /* ③ 고칠 수 있음 — 전화번호를 지우고 새로 친다 */
+  function editPhone(done) {
+    if (!editLine) { later(done, 1200); return; }
+    var e = editLine.el.__edit, h = e.holder;
+    say("이제 고치실 수 있습니다 — 전화번호를 바꿔 보겠습니다", true);
+    h.classList.add("edit");
+
+    var caret = document.createElement("span");
+    caret.className = "caret";
+
+    later(function () {
+      h.textContent = "";
+      h.appendChild(caret);
+      var typed = "", i = 0;
+      (function type() {
+        if (!visible) return;
+        if (i >= e.to.length) {
+          later(function () { caret.remove(); h.classList.remove("edit"); done(); }, 1400);
+          return;
+        }
+        typed += e.to[i++];
+        h.textContent = typed;
+        h.appendChild(caret);
+        later(type, 105);
+      })();
+    }, 620);
+  }
+
+  function loop() {
+    if (!visible) return;
+    reset();
+    later(function () {
+      revive(function () {
+        editPhone(function () { later(loop, 1600); });
+      });
+    }, 700);
+  }
 
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(function (es) {
       es.forEach(function (en) {
+        var was = visible;
         visible = en.isIntersecting;
-        if (visible && !timer) setTimeout(play, 400);
-        else if (!visible) stop();
+        if (visible && !was) loop();
+        if (!visible) stop();
       });
-    }, { threshold: .3 }).observe(box);
-  } else {
-    visible = true; play();
-  }
+    }, { threshold: .25 }).observe(lab);
+  } else { visible = true; loop(); }
+
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) stop();
-    else if (visible && !timer) play();
+    else if (visible) loop();
   });
 })();

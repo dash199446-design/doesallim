@@ -702,3 +702,63 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
   .revive .ch{color:#fff;-webkit-text-stroke-color:transparent}
   .revive .ch::before,.revive .ch::after{opacity:0}
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   히어로 오른쪽 — 살아 움직이는 라벨
+
+   ① 도형          윤곽선 + 모서리 앵커점만. 채움이 없다.
+   ② 되살아남       한 줄씩 진짜 글자로 채워진다.
+   ③ 고칠 수 있음   전화번호가 실제로 바뀐다 — 커서까지.
+
+   ※ 이건 «시연» 이지 측정 결과가 아니다. 그래서 여기에 수치를 붙이지 않는다.
+     실제 산출물과 실측치는 아래 섹션들에 있다.
+   ═══════════════════════════════════════════════════════════════════ */
+.lab{background:#fff;padding:0;color:#121917;font-size:15px}
+.lab-band{background:#E0EAE5;padding:22px 26px 18px;position:relative}
+.lab-brand{font-size:.72em;font-weight:600;color:#32674F;letter-spacing:.04em}
+.lab-title{font-size:1.62em;font-weight:800;letter-spacing:-.035em;margin-top:6px}
+.lab-en{font-size:.66em;color:#32674F;margin-top:3px;letter-spacing:.02em}
+.lab-vol{position:absolute;right:26px;top:44px;font-size:.74em;color:#5C6763}
+.lab-body{padding:20px 26px 6px}
+.lab-h{font-size:.86em;font-weight:700;margin-top:14px;position:relative}
+.lab-h:first-child{margin-top:0}
+.lab-h::before{content:"";position:absolute;left:0;top:-8px;width:14px;height:1.5px;
+  background:#32674F}
+.lab-p{font-size:.74em;color:#3C4643;margin-top:7px;line-height:1.5}
+.lab-foot{background:#E0EAE5;padding:14px 26px 18px;margin-top:16px}
+.lab-s{font-size:.66em;color:#4A5451;line-height:1.75}
+
+/* 글자 하나하나 — 처음에는 «도형» 이다 */
+.lab .g{position:relative;display:inline-block;color:transparent;
+  -webkit-text-stroke:.9px #2A70DB;
+  transition:color .26s ease,-webkit-text-stroke-color .26s ease}
+.lab .g.on{color:inherit;-webkit-text-stroke-color:transparent}
+.lab .g::before,.lab .g::after{content:"";position:absolute;width:2.6px;height:2.6px;
+  background:#2A70DB;transition:opacity .22s ease}
+.lab .g::before{left:-.5px;top:12%}
+.lab .g::after{right:-.5px;bottom:14%}
+.lab .g.on::before,.lab .g.on::after{opacity:0}
+.lab .g.sp{width:.3em;flex:none;-webkit-text-stroke-width:0}
+.lab .g.sp::before,.lab .g.sp::after{display:none}
+.lab .g.now{-webkit-text-stroke-color:#1E7A5A}
+
+/* ③ 고치는 중 — 바뀌는 자리와 커서 */
+.lab .edit{background:rgba(30,122,90,.14);border-radius:2px;padding:0 1px}
+.lab .caret{display:inline-block;width:1.5px;height:1em;background:#1E7A5A;
+  vertical-align:-.14em;margin-left:1px;animation:blink .9s steps(1) infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+#labState{transition:color .3s ease}
+.shot.is-live #labState{color:var(--accent-lit)}
+
+@media(max-width:1039px){.lab{font-size:13.5px}}
+@media(max-width:520px){.lab{font-size:11.5px}.lab-band,.lab-body,.lab-foot{padding-left:18px;padding-right:18px}}
+@supports not (-webkit-text-stroke:1px #000){
+  .lab .g{color:inherit}
+  .lab .g::before,.lab .g::after{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .lab .g{color:inherit;-webkit-text-stroke-color:transparent}
+  .lab .g::before,.lab .g::after{opacity:0}
+  .lab .caret{animation:none}
+}

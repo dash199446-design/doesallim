@@ -17,7 +17,7 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <noscript><link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"></noscript>
-<link rel="stylesheet" href="style.css?v=de65f3e2">
+<link rel="stylesheet" href="style.css?v=8b61124f">
 </head>
 <body>
 
@@ -44,15 +44,6 @@
       한 글자도 수정할 수 없나요. AI가 남은 도형을 서체 원본과 대조해
       <b>무슨 글자였는지 알아내고</b>, 크기·자간·행간을 역산해
       <b>같은 자리에 진짜 텍스트를 되돌려</b> 놓습니다.</p>
-    <!-- 글자가 되살아나는 과정 — 도형(윤곽선+앵커) → 진짜 글자 -->
-    <div class="revive" id="revive">
-      <div class="revive-line" id="reviveLine" aria-label="수분 진정 토너"></div>
-      <div class="revive-meta">
-        <span id="reviveState">도형 — 편집할 수 없음</span>
-        <span id="reviveScore"></span>
-      </div>
-    </div>
-
     <div class="btn-row">
       <a class="btn btn-p" href="restore.html">파일 올려서 복원하기</a>
       <a class="btn btn-g" href="#ai">어떻게 하는 건가요?</a>
@@ -65,22 +56,33 @@
   </div>
 
   <figure class="shot" style="margin:0">
-    <div class="shot-bar"><i></i><i></i><i></i><b>AURELIA_토너_라벨.ai — 복원 전 / 후</b></div>
-    <div class="ba" id="ba">
-      <img src="assets/after.png" alt="복원 후: 글자가 다시 편집 가능한 텍스트가 된 라벨" width="1084" height="723">
-      <div class="top" id="baTop">
-        <img src="assets/before_paths.png" alt="복원 전: 글자마다 앵커포인트가 박힌 도형 덩어리" width="1084" height="723">
+    <div class="shot-bar"><b>AURELIA_토너_라벨.ai</b></div>
+
+    <!-- 살아 움직이는 라벨 — 도형 → 되살아남 → 고칠 수 있음
+         (실물 렌더가 아니라 «만져지는» 것을 보여 주는 시연이다. 측정치가 아니므로
+          아래 숫자는 붙이지 않는다. 진짜 산출물과 실측치는 아래 섹션들에 있다.) -->
+    <div class="lab" id="lab">
+      <div class="lab-band">
+        <div class="lab-brand" data-t="AURELIA"></div>
+        <div class="lab-title" data-t="수분 진정 토너"></div>
+        <div class="lab-en" data-t="HYDRA CALMING TONER"></div>
+        <div class="lab-vol" data-t="민감성 피부용 · 200 mL"></div>
       </div>
-      <span class="ba-tag l">받은 파일 · 전부 도형</span>
-      <span class="ba-tag r">복원 후 · 편집 가능</span>
-      <div class="ba-handle" id="baHandle">
-        <div class="ba-knob"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 7 5 12l4.5 5V7Zm5 0v10l4.5-5-4.5-5Z"/></svg></div>
+      <div class="lab-body">
+        <div class="lab-h" data-t="전성분"></div>
+        <div class="lab-p" data-t="정제수, 글리세린, 부틸렌글라이콜, 나이아신아마이드,"></div>
+        <div class="lab-p" data-t="판테놀, 알란토인, 병풀추출물, 히알루론산, 향료"></div>
+        <div class="lab-h" data-t="사용법"></div>
+        <div class="lab-p" data-t="세안 후 적당량을 화장솜에 덜어 부드럽게 도포합니다."></div>
+      </div>
+      <div class="lab-foot">
+        <div class="lab-s" data-t="제조판매업자  아우렐리아코스메틱  ·  서울시 강남구"></div>
+        <div class="lab-s" data-t="소비자상담실  " data-edit="0000-0000|1588-2026"></div>
       </div>
     </div>
-    <figcaption class="shot-foot">
-      <span>손잡이를 끌어 보세요 — 왼쪽은 일러스트레이터에서 전체 선택한 실제 화면입니다</span>
-      <span>앵커포인트 <b>11,573</b>개</span>
-      <span>복원 후 위치 오차 <b>0.00 pt</b></span>
+
+    <figcaption class="shot-foot" id="labCap">
+      <span id="labState">아웃라인 처리된 상태 — 글자가 전부 도형입니다</span>
     </figcaption>
   </figure>
 </div></section>
@@ -551,6 +553,6 @@
   </div>
 </div></footer>
 
-<script src="landing.js?v=2b089d02" defer></script>
+<script src="landing.js?v=404ae554" defer></script>
 </body>
 </html>
