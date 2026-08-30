@@ -86,10 +86,14 @@ h2.h{font-size:clamp(38px,5.4vw,68px);letter-spacing:-.045em;line-height:1.12;
   .g3{grid-template-columns:repeat(3,1fr)}}
 
 /* ── 네비 ─────────────────────────────────────────────────────── */
-.nav{position:sticky;top:0;z-index:60;background:rgba(252,251,249,.82);
-  backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);
-  border-bottom:1px solid transparent;transition:border-color .2s,background .2s}
-.nav.stuck{border-bottom-color:var(--line)}
+/* 반투명(0.82)이라 큰 제목이 뒤로 비쳐 «글자가 잘려 뭉갠» 것처럼 보였다.
+   스크롤이 시작되면 불투명하게 바꿔 본문이 깨끗하게 지나가게 한다. */
+.nav{position:sticky;top:0;z-index:60;background:var(--paper);
+  border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s}
+.nav.stuck{border-bottom-color:var(--line);
+  box-shadow:0 1px 12px -6px rgba(10,15,13,.28)}
+/* 앵커로 이동할 때 제목이 네비 밑에 깔리지 않게 */
+section[id]{scroll-margin-top:78px}
 .nav .wrap{display:flex;align-items:center;gap:26px;height:62px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;
   letter-spacing:-.045em;text-decoration:none;font-feature-settings:"ss01"}
