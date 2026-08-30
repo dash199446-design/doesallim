@@ -793,7 +793,7 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
   padding:18px 20px;border-radius:0 var(--r) var(--r) 0;margin:22px 0;font-size:15px;
   line-height:1.78}
 .legal .callout.warn{border-left-color:#C99A21;background:#FDF8EC}
-.legal .callout b{display:block;margin-bottom:6px}
+.legal .callout > b:first-child{display:block;margin-bottom:6px;font-size:15.6px;letter-spacing:-.01em}
 .legal .toc{border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;
   margin:32px 0;background:var(--paper-2)}
 .legal .toc b{display:block;font-size:14px;margin-bottom:10px}
