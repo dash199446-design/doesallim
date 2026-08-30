@@ -119,7 +119,8 @@ h2.h{font-size:clamp(38px,5.4vw,68px);letter-spacing:-.045em;line-height:1.12;
           mask-image:radial-gradient(70% 60% at 50% 20%,#000,transparent 78%)}
 .hero>.wrap{position:relative;z-index:2}
 .hero-grid{display:grid;gap:clamp(38px,5vw,56px);align-items:center}
-@media(min-width:1040px){.hero-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)}}
+@media(min-width:1040px){.hero-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr)}}
+@media(min-width:1280px){.hero>.wrap{max-width:1280px}}
 .hero h1{font-size:clamp(33px,5.1vw,58px);letter-spacing:-.042em;line-height:1.13;
   margin-top:22px;font-weight:800}
 .hero h1 em{font-style:normal;color:var(--accent-lit)}
@@ -133,10 +134,14 @@ h2.h{font-size:clamp(38px,5.4vw,68px);letter-spacing:-.045em;line-height:1.12;
 /* ── before/after 슬라이더 (실제 산출물) ─────────────────────── */
 .shot{border-radius:var(--r-lg);overflow:hidden;background:#fff;
   border:1px solid rgba(255,255,255,.12);box-shadow:var(--shadow-lg)}
-.shot-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;
+/* 신호등 점 세 개는 브라우저 창을 흉내 낸 가짜 장식이었다. 여기는 브라우저가
+   아니라 인쇄 파일이므로 파일 이름만 담백하게 적는다. */
+.shot-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;
   background:#1A2320;border-bottom:1px solid rgba(255,255,255,.08)}
-.shot-bar i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.17);display:block}
-.shot-bar b{margin-left:8px;font-size:12.4px;font-weight:500;color:var(--muted-d)}
+.shot-bar i{display:none}
+.shot-bar b{font-size:12.8px;font-weight:500;color:var(--muted-d);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.01em}
+.shot-bar b::before{content:"◧";margin-right:8px;color:var(--accent-lit);opacity:.8}
 .ba{position:relative;user-select:none;touch-action:pan-y;cursor:ew-resize;background:#fff;
   outline-offset:3px}
 .ba img{width:100%;height:auto;display:block;pointer-events:none}
@@ -536,25 +541,26 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
 .count{font-variant-numeric:tabular-nums}
 
 /* ── AI 판정 탐색기 ───────────────────────────────────────────── */
-.probe{margin-top:36px;border:1px solid var(--line-d);border-radius:var(--r-lg);
-  overflow:hidden;background:var(--ink-2)}
-.probe-head{display:flex;gap:8px;flex-wrap:wrap;padding:16px 18px;
-  border-bottom:1px solid var(--line-d)}
-.probe-head button{font:inherit;font-size:19px;font-weight:700;width:52px;height:52px;
-  border-radius:12px;border:1px solid var(--line-d);background:transparent;color:#fff;
-  cursor:pointer;transition:.16s}
+.probe{margin-top:34px;border:0;border-top:2px solid var(--accent-lit);
+  border-radius:0;overflow:visible;background:transparent}
+.probe-head{display:flex;gap:10px;flex-wrap:wrap;padding:26px 0 22px;border-bottom:0}
+.probe-head button{font:inherit;font-size:26px;font-weight:700;width:68px;height:68px;
+  border-radius:16px;border:1px solid var(--line-d);background:transparent;color:#fff;
+  cursor:pointer;transition:transform .16s ease,background .16s,border-color .16s}
+.probe-head button:hover{transform:translateY(-2px)}
 .probe-head button:hover{border-color:var(--accent-lit)}
 .probe-head button[aria-selected="true"]{background:var(--accent);border-color:var(--accent)}
-.probe-body{padding:20px 18px 22px}
+.probe-body{padding:0 0 8px}
 .probe-bars{display:grid;gap:9px;margin-top:4px}
-.probe-bar{display:grid;grid-template-columns:34px 1fr 66px;gap:12px;align-items:center;
+.probe-bars{gap:14px}
+.probe-bar{display:grid;grid-template-columns:44px 1fr 84px;gap:16px;align-items:center;
   font-size:14.6px;color:var(--muted-d)}
-.probe-bar b{color:#fff;font-size:17px;font-weight:700;text-align:center}
-.probe-bar .track{height:10px;border-radius:6px;background:rgba(255,255,255,.09);overflow:hidden}
+.probe-bar b{color:#fff;font-size:23px;font-weight:700;text-align:center}
+.probe-bar .track{height:16px;border-radius:8px;background:rgba(255,255,255,.07);overflow:hidden}
 .probe-bar .fill{height:100%;border-radius:6px;background:var(--accent);
   width:0;transition:width .7s cubic-bezier(.22,1,.36,1)}
 .probe-bar:first-child .fill{background:var(--accent-lit)}
-.probe-bar .v{text-align:right;font-variant-numeric:tabular-nums;color:#fff}
+.probe-bar .v{text-align:right;font-variant-numeric:tabular-nums;color:#fff;font-size:17px}
 .probe-note{margin-top:16px;font-size:13.6px;color:var(--muted-d);line-height:1.65}
 .probe-note b{color:#fff}
 
@@ -630,3 +636,23 @@ footer .legal{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-d
 
 /* ── 갤러리를 넓게 ─────────────────────────────────────────────── */
 @media(min-width:1100px){.gal-stage{grid-template-columns:minmax(0,1.9fr) minmax(0,.68fr)}}
+
+
+/* ── 스크롤 연동 모션 ───────────────────────────────────────────
+   페이드인만 넣어 놓고 «모션»이라고 부르던 것을 실제 움직임으로 바꾼다.
+   움직임은 «지금 무엇을 보고 있는지»를 알려 주는 데만 쓴다. 장식이 아니다. */
+.par{will-change:transform}
+.strip-row{transition:background .35s ease}
+.strip-row.hot{background:var(--accent-soft)}
+.strip-row.hot .n{color:var(--accent)}
+.slip-row{transition:background .3s ease,padding-left .3s ease}
+.slip-row.hot{background:var(--paper-2)}
+@media(min-width:820px){.slip-row.hot{padding-left:14px}}
+.rv-stagger > *{opacity:0;transform:translateY(16px)}
+.rv-stagger.in > *{opacity:1;transform:none;
+  transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){
+  .par{transform:none!important}
+  .strip-row.hot,.slip-row.hot{background:transparent}
+  .rv-stagger > *{opacity:1;transform:none}
+}

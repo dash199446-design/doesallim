@@ -276,3 +276,101 @@
       });
   })();
 })();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   스크롤 연동 모션 (2026-08-30)
+
+   원칙: 움직임은 «지금 무엇을 보고 있는지» 를 알려 주는 데만 쓴다.
+   예뻐 보이려고 흔드는 것은 넣지 않는다. 화면 멀미를 줄이려면 폭이 작아야 한다.
+   prefers-reduced-motion 을 켠 사람에게는 전부 끈다.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  /* ── 히어로 그림 시차 — 스크롤보다 조금 느리게 따라온다 ────────── */
+  var shot = document.querySelector(".hero .shot");
+  if (shot) {
+    shot.classList.add("par");
+    var ticking = false;
+    function move() {
+      var y = Math.min(scrollY, 700);
+      shot.style.transform = "translate3d(0," + (y * -0.055).toFixed(1) + "px,0)";
+      ticking = false;
+    }
+    addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(move); }
+    }, { passive: true });
+    move();
+  }
+
+  /* ── 지금 보고 있는 줄을 밝힌다 (필름스트립·납품 내역서) ────────── */
+  if ("IntersectionObserver" in window) {
+    var hot = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        en.target.classList.toggle("hot", en.isIntersecting);
+      });
+    }, { rootMargin: "-42% 0px -42% 0px" });
+    document.querySelectorAll(".strip-row, .slip-row").forEach(function (el) {
+      hot.observe(el);
+    });
+
+    /* ── 목록은 한 줄씩 차례로 나타난다 ──────────────────────────── */
+    document.querySelectorAll(".plain3, .slip, .gal-tabs").forEach(function (g) {
+      g.classList.add("rv-stagger");
+      [].forEach.call(g.children, function (c, i) {
+        c.style.transitionDelay = (i * 70) + "ms";
+      });
+    });
+    var st = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        st.unobserve(en.target);
+        en.target.classList.add("in");
+      });
+    }, { threshold: .15 });
+    document.querySelectorAll(".rv-stagger").forEach(function (g) { st.observe(g); });
+
+    /* ── 판정 막대는 화면에 들어올 때 한 번 채워진다 ─────────────── */
+    var pb = document.getElementById("probeBars");
+    if (pb) {
+      var once = new IntersectionObserver(function (es, o) {
+        es.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          o.disconnect();
+          [].forEach.call(pb.querySelectorAll(".fill"), function (f) {
+            var w = f.style.width; f.style.width = "0";
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () { f.style.width = w; });
+            });
+          });
+        });
+      }, { threshold: .4 });
+      once.observe(pb);
+    }
+
+    /* ── 갤러리도 처음 보일 때 한 번 쓸어 준다 ───────────────────── */
+    var gv = document.getElementById("galView");
+    if (gv) {
+      var teased = false;
+      new IntersectionObserver(function (es, o) {
+        es.forEach(function (en) {
+          if (!en.isIntersecting || teased) return;
+          teased = true; o.disconnect();
+          var top = document.getElementById("galTop"),
+              hd = document.getElementById("galHandle"), t0 = null;
+          function tick(t) {
+            if (t0 === null) t0 = t;
+            var k = Math.min(1, (t - t0) / 1500);
+            var e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+            var pos = 0.5 + Math.sin(e * Math.PI) * 0.32;
+            top.style.clipPath = "inset(0 " + ((1 - pos) * 100).toFixed(2) + "% 0 0)";
+            hd.style.left = (pos * 100).toFixed(2) + "%";
+            if (k < 1) requestAnimationFrame(tick);
+          }
+          setTimeout(function () { requestAnimationFrame(tick); }, 420);
+        });
+      }, { threshold: .35 }).observe(gv);
+    }
+  }
+})();
