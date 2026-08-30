@@ -636,3 +636,25 @@ def build_ambiguous_card(work: Path, outlined: Path, dst: Path, out_w: int = 900
            fill=(92, 103, 99), font=_ui(14))
     canvas.save(dst, optimize=True)
     print(f"   미상 카드: {ln['text'][:24]!r}  I={s1:.4f}  l={s2:.4f}")
+
+
+def compose_anchor(plain_png: Path, anchor_png: Path, dst: Path) -> None:
+    """배경 위에 앵커포인트를 얹는다.
+
+    앵커 뷰는 흰 종이에 좌표만 그린 것이라 배경 색면이 없다. 그대로 전/후 슬라이더에
+    쓰면 왼쪽만 배경이 빠져 «렌더링이 깨진 것»처럼 보인다.
+    실제 인쇄물에는 배경이 그대로 있으므로, 원본 렌더 위에 앵커만 덮어 씌운다.
+    (앵커 뷰의 흰 픽셀은 버리고, 파란 선·점만 가져온다.)
+    """
+    from PIL import Image
+    import numpy as np
+    base = Image.open(plain_png).convert("RGB")
+    ank = Image.open(anchor_png).convert("RGB")
+    if ank.size != base.size:
+        ank = ank.resize(base.size, Image.LANCZOS)
+    b = np.asarray(base).astype("int16")
+    a = np.asarray(ank).astype("int16")
+    ink = a.min(axis=2) < 235                    # 흰 배경이 아닌 곳 = 앵커
+    out = b.copy()
+    out[ink] = a[ink]
+    Image.fromarray(out.astype("uint8")).save(dst, optimize=True)

@@ -265,7 +265,23 @@ def run_one(key: str, label: str, note: str, build, page_w: float) -> dict | Non
     dest = OUT / key
     dest.mkdir(parents=True, exist_ok=True)
     from PIL import Image
-    for src, name in ((gt, "before"), (restored, "after")):
+
+    # 「복원 전 / 후」를 나란히 놓으면 **아무 차이도 안 보인다.** 그게 이 서비스의
+    # 핵심이지만(디자인이 안 바뀐다), 슬라이더로는 고장난 것처럼 읽힌다.
+    # 그래서 «전» 쪽은 파일의 실제 내용 — 글자마다 박힌 앵커포인트 — 을 보여 준다.
+    # 연출이 아니라 outlined.pdf 안에 실제로 들어 있는 좌표를 그대로 찍는 것이다.
+    import importlib.util
+    _spec = importlib.util.spec_from_file_location("_ma", ROOT / "site" / "make_assets.py")
+    _ma = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_ma)
+    paths_pdf = work / "paths.pdf"
+    try:
+        _ma.build_anchor_view(gt, paths_pdf)
+    except Exception as exc:                                   # noqa: BLE001
+        print(f"  [{key}] 앵커 뷰 실패: {exc}")
+        paths_pdf = None
+
+    for src, name in ((paths_pdf or gt, "_anchor"), (restored, "after"),
+                      (gt, "plain")):
         if src is None:
             continue
         d = pymupdf.open(src)
@@ -275,6 +291,14 @@ def run_one(key: str, label: str, note: str, build, page_w: float) -> dict | Non
         w = 1000
         im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
         im.convert("RGB").quantize(colors=128).save(dest / f"{name}.png", optimize=True)
+
+    # 앵커 뷰를 원본 배경 위에 얹어 «받은 파일» 쪽을 만든다.
+    try:
+        _ma.compose_anchor(dest / "plain.png", dest / "_anchor.png", dest / "before.png")
+        (dest / "_anchor.png").unlink(missing_ok=True)
+    except Exception as exc:                                   # noqa: BLE001
+        print(f"  [{key}] 앵커 합성 실패: {exc}")
+        shutil.copy2(dest / "_anchor.png", dest / "before.png")
 
     det = len(lines.get("lines", []))
     ok = (spec.get("summary") or {}).get("ok", 0)

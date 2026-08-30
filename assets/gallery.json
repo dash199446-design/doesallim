@@ -8,7 +8,7 @@
    "detected": 16,
    "restored": 14,
    "refused": 2,
-   "seconds": 34.6
+   "seconds": 35.1
   },
   {
    "key": "supplement",
@@ -17,7 +17,7 @@
    "detected": 29,
    "restored": 29,
    "refused": 0,
-   "seconds": 39.4
+   "seconds": 39.8
   },
   {
    "key": "brochure",
@@ -26,7 +26,7 @@
    "detected": 19,
    "restored": 18,
    "refused": 1,
-   "seconds": 35.7
+   "seconds": 36.6
   },
   {
    "key": "card",
@@ -35,7 +35,7 @@
    "detected": 7,
    "restored": 6,
    "refused": 1,
-   "seconds": 27.5
+   "seconds": 27.2
   },
   {
    "key": "food",
@@ -44,7 +44,7 @@
    "detected": 27,
    "restored": 26,
    "refused": 1,
-   "seconds": 42.5
+   "seconds": 36.6
   }
  ]
 }
