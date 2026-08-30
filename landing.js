@@ -324,7 +324,9 @@
         en.target.classList.toggle("hot", en.isIntersecting);
       });
     }, { rootMargin: "-42% 0px -42% 0px" });
-    document.querySelectorAll(".strip-row, .slip-row").forEach(function (el) {
+    // 납품 내역서는 제외한다 — 가만히 읽는 목록이라 안내가 필요 없고,
+    // 두 줄이 동시에 걸리면 오히려 헷갈린다.
+    document.querySelectorAll(".strip-row").forEach(function (el) {
       hot.observe(el);
     });
 
@@ -381,4 +383,106 @@
       }, { threshold: .35 }).observe(gv);
     }
   }
+})();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   히어로 — 글자가 되살아나는 과정 (2026-08-30)
+
+   왼쪽 상태(윤곽선 + 앵커점)가 오른쪽 상태(채워진 글자)로 한 글자씩 넘어간다.
+   글자마다 겹침 점수를 같이 띄운다 — 이 점수는 실제 판정 데이터(probe.json)에서
+   가져온다. 없는 글자는 애니메이션만 하고 점수는 비운다. 숫자를 지어내지 않는다.
+
+   멈추는 조건: 화면 밖 / prefers-reduced-motion / 탭이 안 보일 때.
+   ═══════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  var box = document.getElementById("revive"),
+      line = document.getElementById("reviveLine"),
+      state = document.getElementById("reviveState"),
+      score = document.getElementById("reviveScore");
+  if (!box || !line) return;
+
+  var TEXT = "수분 진정 토너";
+  var chars = [];
+  TEXT.split("").forEach(function (c) {
+    var el = document.createElement("span");
+    el.className = (c === " ") ? "ch sp" : "ch";
+    el.textContent = c;
+    line.appendChild(el);
+    chars.push({ el: el, c: c });
+  });
+
+  var RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (RM) {
+    chars.forEach(function (x) { x.el.classList.add("on"); });
+    state.textContent = "복원 완료 — 편집할 수 있는 텍스트";
+    return;
+  }
+
+  // 화면에 쓰는 바로 그 줄의 «실제» 판정 결과를 읽어 온다.
+  // 다른 글자의 점수를 빌려 오거나 그럴듯한 숫자를 지어내지 않는다.
+  var scores = {}, fontName = "";
+  fetch("assets/hero.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d) return;
+      fontName = String(d.font || "").replace(/\.(otf|ttf)$/i, "");
+      (d.glyphs || []).forEach(function (g) { scores[g.ch] = g.iou; });
+    })
+    .catch(function () { /* 없으면 점수 없이 돈다 */ });
+
+  var timer = null, visible = false;
+
+  function reset() {
+    box.classList.remove("done");
+    chars.forEach(function (x) { x.el.classList.remove("on", "now"); });
+    state.textContent = "도형 — 편집할 수 없음";
+    score.textContent = "";
+  }
+
+  function play() {
+    reset();
+    var i = 0;
+    (function step() {
+      if (!visible) { timer = null; return; }
+      if (i > 0) chars[i - 1].el.classList.remove("now");
+      if (i >= chars.length) {
+        box.classList.add("done");
+        state.textContent = "복원 완료 — 편집할 수 있는 텍스트";
+        score.textContent = fontName ? fontName : "";
+        timer = setTimeout(play, 2600);
+        return;
+      }
+      var x = chars[i];
+      x.el.classList.add("now");
+      state.textContent = "글자를 맞히는 중…";
+      // 점수를 아는 글자만 숫자를 띄운다. 공백 등에서 비우면 깜빡이므로
+      // 모르는 글자는 직전 표시를 그대로 둔다.
+      var s = scores[x.c];
+      if (s != null) score.textContent = x.c + "  " + s.toFixed(4);
+      setTimeout(function () {
+        x.el.classList.add("on");
+      }, 130);
+      i += 1;
+      timer = setTimeout(step, 230);
+    })();
+  }
+
+  function stop() { if (timer) { clearTimeout(timer); timer = null; } }
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        visible = en.isIntersecting;
+        if (visible && !timer) setTimeout(play, 400);
+        else if (!visible) stop();
+      });
+    }, { threshold: .3 }).observe(box);
+  } else {
+    visible = true; play();
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stop();
+    else if (visible && !timer) play();
+  });
 })();
