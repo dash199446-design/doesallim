@@ -1,6 +1,6 @@
 {
-    "online":  true,
-    "api":  "https://give-mario-narrative-boring.trycloudflare.com",
-    "updated":  "2026-09-01T14:42:47Z",
-    "note":  "복원 서버가 켜져 있습니다."
+    "online":  false,
+    "api":  "",
+    "updated":  "2026-09-01T14:43:02Z",
+    "note":  "복원 서버가 꺼져 있어 접수를 받지 않습니다."
 }
