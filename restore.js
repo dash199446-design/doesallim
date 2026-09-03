@@ -17,6 +17,8 @@
   "use strict";
 
   var API = null;                  // 접수구 주소 (없으면 복원 불가)
+
+  var VISION_OFFERED = false;
   var picked = null;               // 사용자가 고른 File
   var busy = false;
 
@@ -54,6 +56,9 @@
           .then(function (h) {
             if (!h || !h.ok) throw new Error("health");
             API = base;
+            // 서버가 이 선택지를 제공할 때만 화면에 내놓는다. 제공하지 않는 선택지를
+            // 보여 주면 «켰는데 안 켜졌다» 가 된다.
+            VISION_OFFERED = !!(h.vision && h.vision.usable);
             badge(true, "접수 중", "보통 1~3분");
           });
       })
@@ -214,12 +219,37 @@
         "<span><b>복원 서버가 지금 꺼져 있습니다.</b> 잠시 뒤 다시 시도해 주세요 — " +
         "이 페이지는 서버가 켜지면 자동으로 알아챕니다.</span></p>";
     }
-    return '<div class="btn-row" style="margin-top:22px">' +
+    return visionChoice() +
+      '<div class="btn-row" style="margin-top:22px">' +
       '<button class="btn btn-p" type="button" id="startBtn">복원 시작 — 무료 베타</button></div>' +
       '<p class="privacy-note warn" style="margin-top:14px">' +
       '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a5 5 0 0 0-5 5v1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-1V7a5 5 0 0 0-5-5Zm3 6H7V7a3 3 0 1 1 6 0v1Z"/></svg>' +
       "<span><b>여기서부터 파일이 복원 서버로 전송됩니다.</b> " +
       "72시간 뒤 자동 삭제되고, 결과 화면에서 즉시 삭제하실 수도 있습니다.</span></p>";
+  }
+
+  /* ── 비전 교차검증 선택 ────────────────────────────────────────────
+     한글은 모양이 비슷한 글자가 많아(믈/물, 뮴/듐, 촤/화) 도형 대조만으로는
+     자주 갈리지 않는다. 외부 LLM 에 «그 줄을 잘라낸 이미지» 를 보여 주고
+     교차검증하면 크게 좋아지지만, 그러면 파일 일부가 이 서버를 벗어난다.
+
+     그래서 고객이 그 작업에 대해 직접 정하게 한다. **기본은 끔.**
+     체크하지 않으면 서버가 `--no-vision` 으로 돌고 API 키도 지운 채 실행한다
+     (`web/api/engine.py` 의 `vision_allowed`). 동의는 이 작업에만 적용된다. */
+  function visionChoice() {
+    if (!VISION_OFFERED) return "";
+    return '<label class="optbox" for="visionOk">' +
+      '<input type="checkbox" id="visionOk">' +
+      "<span><b>한글이 많은 파일이면 켜 주세요 — 외부 교차검증 허용</b>" +
+      "<em>한글은 <b>믈/물, 뮴/듐, 촤/화</b> 처럼 모양이 비슷한 글자가 많아 " +
+      "도형 대조만으로는 자주 갈리지 않습니다. 켜면 <b>글자 줄을 잘라낸 이미지</b>를 " +
+      "외부 AI(Anthropic, 미국)에 보여 주고 한 번 더 확인합니다 — 판독 정확도가 " +
+      "크게 올라갑니다.<br>" +
+      "보내는 것은 <b>줄 단위 크롭 이미지</b>이고 원본 파일 전체가 아닙니다. " +
+      "이 작업에만 적용되며 다음 작업으로 이어지지 않습니다. " +
+      "<b>끄면 파일이 이 서버를 벗어나지 않습니다</b> (기본값). " +
+      '자세한 내용은 <a href="privacy.html#c3" target="_blank">개인정보 처리방침 §3</a>.' +
+      "</em></span></label>";
   }
 
   function wireRe() {
@@ -308,6 +338,9 @@
 
       var jf = new FormData();
       jf.append("diagnosis_id", d.diagnosis_id);
+      // 체크했을 때만 «참» 을 보낸다. 안 보내면 서버는 동의 없음으로 다룬다.
+      var vk = $("visionOk");
+      if (vk && vk.checked) jf.append("vision_consent", "true");
       var jR = await fetch(API + "/api/jobs", { method: "POST", body: jf });
       var j = await jR.json();
       if (!jR.ok) return failBox(j.message || "접수하지 못했습니다.", j.error);
@@ -380,6 +413,20 @@
       '<div class="ba-handle" id="baHandle"><div class="ba-knob">' +
       '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 7 5 12l4.5 5V7Zm5 0v10l4.5-5-4.5-5Z"/></svg>' +
       "</div></div></div>";
+
+    // 이 작업에서 파일이 «실제로» 외부로 나갔는지 그대로 적는다. 동의했든 안 했든 밝힌다 —
+    // 나가지 않았다는 사실도 고객이 확인할 수 있어야 약속이 약속이 된다.
+    var ev = status.external_verification;
+    if (ev) {
+      html += '<p class="privacy-note" style="margin-top:20px">' +
+        '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1 3 4v5c0 4.4 2.9 8.4 7 9.6 4.1-1.2 7-5.2 7-9.6V4l-7-3Z"/></svg>' +
+        "<span>" + (ev.crops_sent_to_external_api
+          ? "<b>외부 교차검증을 사용했습니다.</b> 허용해 주신 대로 글자 줄 크롭 이미지를 " +
+            esc(ev.recipient || "외부 AI") + " 에 보여 주고 판독을 한 번 더 확인했습니다. " +
+            "원본 파일 전체는 보내지 않았습니다."
+          : "<b>파일이 이 서버를 벗어나지 않았습니다.</b> 외부 교차검증을 사용하지 않았습니다.") +
+        "</span></p>";
+    }
 
     if (ln.refused) {
       html += '<div class="bigwarn" style="margin-top:22px">' +
